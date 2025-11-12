@@ -35,6 +35,9 @@
         .loading-content {
             text-align: center;
             z-index: 10;
+            position: relative;
+            left: 0; /* Убрали сдвиг вправо */
+            transform: none; /* Убрали трансформацию */
         }
         
         h1 {
@@ -69,6 +72,7 @@
             font-size: 18px;
             padding: 0 20px;
             font-family: 'Times New Roman', serif;
+            text-align: center; /* Центрируем текст внутри поля */
         }
         
         .input-field::placeholder {
@@ -77,8 +81,8 @@
         
         .cursor {
             position: absolute;
-            width: 60px; /* Увеличен в 3 раза (было 20px) */
-            height: 90px; /* Увеличен в 3 раза (было 30px) */
+            width: 60px;
+            height: 90px;
             background: url('kursor.png') no-repeat center center;
             background-size: contain;
             z-index: 20;
@@ -260,7 +264,7 @@
         <!-- Точки пути для визуализации -->
         <div class="movement-path" id="movement-path"></div>
         
-        <!-- Основной контент -->
+        <!-- Основной контент - теперь по центру -->
         <div class="loading-content">
             <h1>🤖 Программирование Робота</h1>
             
@@ -312,21 +316,22 @@
             const finalX = centerX - 500;
             const finalY = centerY;
             
-            // Поле ввода находится в конечной точке
+            // Поле ввода теперь находится в центре экрана
             const inputRect = inputField.getBoundingClientRect();
-            const targetX = finalX;
-            const targetY = finalY;
+            const targetX = centerX; // Теперь поле ввода в центре
+            const targetY = centerY + 80; // Немного ниже заголовка
             
-            // Обновляем позицию поля ввода чтобы оно было в конечной точке курсора
+            // Обновляем позицию контента - теперь он остается по центру
             const loadingContent = document.querySelector('.loading-content');
-            loadingContent.style.transform = `translateX(500px)`; // Сдвигаем контент вправо
+            // Убрали transform: translateX(500px) - теперь контент по центру
             
             // Функция для отображения точек пути (для отладки)
             function showPathPoints() {
                 const points = [
                     {x: cursorX, y: cursorY, label: 'Старт'},
                     {x: centerX, y: centerY, label: 'Центр'},
-                    {x: finalX, y: finalY, label: 'Конец'}
+                    {x: finalX, y: finalY, label: 'Конец (500px слева)'},
+                    {x: targetX, y: targetY, label: 'Поле ввода (центр)'}
                 ];
                 
                 points.forEach(point => {
@@ -346,7 +351,8 @@
                     X: ${Math.round(x)}<br>
                     Y: ${Math.round(y)}<br>
                     Center: ${Math.round(centerX)}, ${Math.round(centerY)}<br>
-                    Final: ${Math.round(finalX)}, ${Math.round(finalY)}
+                    Final: ${Math.round(finalX)}, ${Math.round(finalY)}<br>
+                    Target: ${Math.round(targetX)}, ${Math.round(targetY)}
                 `;
             }
             
@@ -444,18 +450,25 @@
                         setTimeout(() => {
                             // 2. Движение на 500px налево от центра
                             moveCursorTo(finalX, finalY, 1500, () => {
-                                updateDebugInfo(cursorX, cursorY, 'Reached Final Position');
+                                updateDebugInfo(cursorX, cursorY, 'Reached Left Position');
                                 
-                                // 3. Анимация клика
+                                // 3. Движение обратно к полю ввода (центр экрана)
                                 setTimeout(() => {
-                                    animateClick(() => {
-                                        // 4. Ввод текста
+                                    moveCursorTo(targetX, targetY, 1500, () => {
+                                        updateDebugInfo(cursorX, cursorY, 'Reached Input Field');
+                                        
+                                        // 4. Анимация клика
                                         setTimeout(() => {
-                                            typeText('загрузить на 100%', 100, () => {
-                                                // 5. Начало загрузки
+                                            animateClick(() => {
+                                                // 5. Ввод текста
                                                 setTimeout(() => {
-                                                    startProgressAnimation();
-                                                }, 1000);
+                                                    typeText('загрузить на 100%', 100, () => {
+                                                        // 6. Начало загрузки
+                                                        setTimeout(() => {
+                                                            startProgressAnimation();
+                                                        }, 1000);
+                                                    });
+                                                }, 500);
                                             });
                                         }, 500);
                                     });
