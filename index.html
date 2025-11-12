@@ -20,6 +20,7 @@
             display: flex;
             justify-content: center;
             align-items: center;
+            cursor: none;
         }
         
         #loading-container {
@@ -76,14 +77,20 @@
         }
         
         .cursor {
-            position: absolute;
-            width: 20px;
-            height: 30px;
+            position: fixed;
+            width: 60px; /* Увеличен в 3 раза (было 20px) */
+            height: 90px; /* Увеличен в 3 раза (было 30px) */
             background: url('kursor.png') no-repeat center center;
             background-size: contain;
-            z-index: 20;
+            z-index: 100;
             opacity: 0;
             pointer-events: none;
+            transform-origin: center center;
+            transition: transform 0.1s ease;
+        }
+        
+        .cursor.clicking {
+            transform: scale(0.8);
         }
         
         .progress-container {
@@ -154,6 +161,18 @@
         .floating-element:nth-child(4) { top: 30%; left: 70%; animation-delay: 3s; }
         .floating-element:nth-child(5) { top: 70%; left: 30%; animation-delay: 4s; }
         
+        .click-target {
+            position: absolute;
+            width: 50px;
+            height: 50px;
+            background: rgba(255, 213, 79, 0.3);
+            border-radius: 50%;
+            top: 50%;
+            right: 20px;
+            transform: translateY(-50%);
+            display: none; /* Для отладки можно включить */
+        }
+        
         @keyframes fadeIn {
             from { opacity: 0; transform: translateY(20px); }
             to { opacity: 1; transform: translateY(0); }
@@ -162,11 +181,6 @@
         @keyframes float {
             0%, 100% { transform: translateY(0px) rotate(0deg); }
             50% { transform: translateY(-20px) rotate(5deg); }
-        }
-        
-        @keyframes click {
-            0%, 100% { transform: scale(1); }
-            50% { transform: scale(0.8); }
         }
         
         @keyframes typewriter {
@@ -216,6 +230,7 @@
             
             <div class="loading-box" id="input-container">
                 <input type="text" class="input-field" id="command-input" placeholder="Введите команду загрузки..." readonly>
+                <div class="click-target" id="click-target"></div>
                 <div class="cursor" id="cursor"></div>
             </div>
             
@@ -235,21 +250,33 @@
         document.addEventListener('DOMContentLoaded', function() {
             const cursor = document.getElementById('cursor');
             const inputField = document.getElementById('command-input');
+            const inputContainer = document.getElementById('input-container');
             const progressBar = document.getElementById('progress-bar');
             const progressText = document.getElementById('progress-text');
             const progressContainer = document.getElementById('progress-container');
             const loadingMessage = document.getElementById('loading-message');
+            const clickTarget = document.getElementById('click-target');
             
-            // Начальные координаты курсора (вне экрана)
+            // Начальные координаты курсора (вне экрана слева)
             let cursorX = -100;
             let cursorY = window.innerHeight / 2;
             
-            // Финальные координаты (центр поля ввода)
-            const inputRect = inputField.getBoundingClientRect();
-            const targetX = inputRect.left + inputRect.width / 2 - 10;
-            const targetY = inputRect.top + inputRect.height / 2 - 15;
+            // Вычисляем точные координаты для клика по полю ввода
+            const inputRect = inputContainer.getBoundingClientRect();
             
-            // Функция для плавного движения курсора
+            // Координаты для клика - правая часть поля ввода, где обычно находится кнопка "ввод"
+            const targetX = inputRect.right - 40; // 40px от правого края
+            const targetY = inputRect.top + inputRect.height / 2;
+            
+            // Устанавливаем начальную позицию курсора
+            cursor.style.left = cursorX + 'px';
+            cursor.style.top = cursorY + 'px';
+            
+            // Позиционируем цель для клика (для отладки)
+            clickTarget.style.left = (targetX - 25) + 'px';
+            clickTarget.style.top = (targetY - 25) + 'px';
+
+            // Функция для плавного движения курсора по прямой линии
             function moveCursorTo(x, y, duration, callback) {
                 cursor.style.opacity = '1';
                 
@@ -257,15 +284,18 @@
                 const startY = cursorY;
                 const startTime = performance.now();
                 
+                // Рассчитываем расстояние и направление
+                const deltaX = x - startX;
+                const deltaY = y - startY;
+                const distance = Math.sqrt(deltaX * deltaX + deltaY * deltaY);
+                
                 function animate(currentTime) {
                     const elapsed = currentTime - startTime;
                     const progress = Math.min(elapsed / duration, 1);
                     
-                    // Эasing функция для плавности
-                    const easeProgress = 1 - Math.pow(1 - progress, 3);
-                    
-                    cursorX = startX + (x - startX) * easeProgress;
-                    cursorY = startY + (y - startY) * easeProgress;
+                    // Линейное движение по прямой
+                    cursorX = startX + deltaX * progress;
+                    cursorY = startY + deltaY * progress;
                     
                     cursor.style.left = cursorX + 'px';
                     cursor.style.top = cursorY + 'px';
@@ -278,15 +308,18 @@
                 }
                 
                 requestAnimationFrame(animate);
+                
+                console.log(`Движение курсора: от (${startX}, ${startY}) к (${x}, ${y})`);
+                console.log(`Расстояние: ${Math.round(distance)}px, Время: ${duration}ms`);
             }
             
             // Функция для анимации клика
             function animateClick(callback) {
-                cursor.style.animation = 'click 0.3s ease-in-out';
+                cursor.classList.add('clicking');
                 setTimeout(() => {
-                    cursor.style.animation = '';
+                    cursor.classList.remove('clicking');
                     if (callback) callback();
-                }, 300);
+                }, 200);
             }
             
             // Функция для ввода текста
@@ -324,15 +357,25 @@
             
             // Основная последовательность анимаций
             function startLoadingAnimation() {
-                // 1. Движение курсора к полю ввода
+                console.log('Начало анимации загрузки');
+                console.log('Координаты цели:', { x: targetX, y: targetY });
+                console.log('Размеры поля ввода:', inputRect);
+                
+                // 1. Движение курсора к полю ввода (3 секунды)
                 setTimeout(() => {
-                    moveCursorTo(targetX, targetY, 2000, () => {
+                    moveCursorTo(targetX, targetY, 3000, () => {
+                        console.log('Курсор достиг цели');
+                        
                         // 2. Анимация клика
                         setTimeout(() => {
                             animateClick(() => {
+                                console.log('Клик выполнен');
+                                
                                 // 3. Ввод текста
                                 setTimeout(() => {
                                     typeText('загрузить на 100%', 100, () => {
+                                        console.log('Текст введен');
+                                        
                                         // 4. Начало загрузки
                                         setTimeout(() => {
                                             startProgressAnimation();
@@ -392,8 +435,14 @@
             const style = document.createElement('style');
             style.textContent = `
                 @keyframes fadeOut {
-                    from { opacity: 1; }
-                    to { opacity: 0; }
+                    from { 
+                        opacity: 1; 
+                        transform: scale(1);
+                    }
+                    to { 
+                        opacity: 0; 
+                        transform: scale(1.1);
+                    }
                 }
             `;
             document.head.appendChild(style);
@@ -403,12 +452,14 @@
             
             // Резервный вариант если курсор не загрузится
             setTimeout(() => {
-                if (cursor.style.opacity === '0') {
-                    cursor.style.backgroundColor = '#ffd54f';
+                if (cursor.style.opacity === '0' || !cursor.style.backgroundImage) {
+                    console.log('Используется резервный курсор');
+                    cursor.style.background = 'radial-gradient(circle, #ffd54f 0%, #ffb300 100%)';
                     cursor.style.borderRadius = '50%';
-                    cursor.style.boxShadow = '0 0 10px #ffd54f';
+                    cursor.style.boxShadow = '0 0 20px #ffd54f, 0 0 40px #ffb300';
+                    cursor.style.border = '2px solid #ffffff';
                 }
-            }, 3000);
+            }, 2000);
         });
     </script>
 </body>
