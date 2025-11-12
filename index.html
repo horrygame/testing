@@ -77,13 +77,28 @@
         
         .cursor {
             position: absolute;
-            width: 20px;
-            height: 30px;
+            width: 60px; /* Увеличен в 3 раза (было 20px) */
+            height: 90px; /* Увеличен в 3 раза (было 30px) */
             background: url('kursor.png') no-repeat center center;
             background-size: contain;
             z-index: 20;
             opacity: 0;
             pointer-events: none;
+            filter: drop-shadow(2px 2px 4px rgba(0, 0, 0, 0.5));
+        }
+        
+        .cursor-backup {
+            position: absolute;
+            width: 60px;
+            height: 90px;
+            background: linear-gradient(45deg, #ffd54f, #ffb300);
+            border-radius: 50% 50% 50% 0;
+            transform: rotate(-45deg);
+            z-index: 20;
+            opacity: 0;
+            pointer-events: none;
+            box-shadow: 0 0 20px #ffd54f;
+            display: none;
         }
         
         .progress-container {
@@ -95,7 +110,7 @@
             margin-top: 30px;
             overflow: hidden;
             opacity: 0;
-            animation: fadeIn 1s ease-in-out 6s forwards;
+            animation: fadeIn 1s ease-in-out 8s forwards;
         }
         
         .progress-bar {
@@ -123,7 +138,7 @@
             font-size: 18px;
             color: #d7ccc8;
             opacity: 0;
-            animation: fadeIn 1s ease-in-out 6.5s forwards;
+            animation: fadeIn 1s ease-in-out 8.5s forwards;
         }
         
         .medieval-decoration {
@@ -154,6 +169,25 @@
         .floating-element:nth-child(4) { top: 30%; left: 70%; animation-delay: 3s; }
         .floating-element:nth-child(5) { top: 70%; left: 30%; animation-delay: 4s; }
         
+        .movement-path {
+            position: absolute;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            pointer-events: none;
+            z-index: 15;
+        }
+        
+        .path-point {
+            position: absolute;
+            width: 8px;
+            height: 8px;
+            background: rgba(255, 213, 79, 0.5);
+            border-radius: 50%;
+            transform: translate(-50%, -50%);
+        }
+        
         @keyframes fadeIn {
             from { opacity: 0; transform: translateY(20px); }
             to { opacity: 1; transform: translateY(0); }
@@ -166,7 +200,7 @@
         
         @keyframes click {
             0%, 100% { transform: scale(1); }
-            50% { transform: scale(0.8); }
+            50% { transform: scale(0.7); }
         }
         
         @keyframes typewriter {
@@ -178,7 +212,7 @@
             overflow: hidden;
             border-right: 2px solid #ffd54f;
             white-space: nowrap;
-            animation: typewriter 2s steps(20) 3s forwards;
+            animation: typewriter 2s steps(20) 6s forwards;
         }
         
         .completed-text {
@@ -195,6 +229,19 @@
             50% { opacity: 0.7; }
             100% { opacity: 1; }
         }
+        
+        .debug-info {
+            position: fixed;
+            top: 10px;
+            left: 10px;
+            background: rgba(0, 0, 0, 0.7);
+            color: white;
+            padding: 10px;
+            border-radius: 5px;
+            font-size: 12px;
+            font-family: monospace;
+            z-index: 100;
+        }
     </style>
 </head>
 <body>
@@ -210,13 +257,15 @@
             <div class="floating-element">🔧</div>
         </div>
         
+        <!-- Точки пути для визуализации -->
+        <div class="movement-path" id="movement-path"></div>
+        
         <!-- Основной контент -->
         <div class="loading-content">
             <h1>🤖 Программирование Робота</h1>
             
             <div class="loading-box" id="input-container">
                 <input type="text" class="input-field" id="command-input" placeholder="Введите команду загрузки..." readonly>
-                <div class="cursor" id="cursor"></div>
             </div>
             
             <div class="progress-container" id="progress-container">
@@ -229,29 +278,82 @@
                 Подготовка к путешествию в мир программирования...
             </div>
         </div>
+        
+        <!-- Курсоры -->
+        <div class="cursor" id="cursor"></div>
+        <div class="cursor-backup" id="cursor-backup"></div>
+        
+        <!-- Отладочная информация -->
+        <div class="debug-info" id="debug-info"></div>
     </div>
 
     <script>
         document.addEventListener('DOMContentLoaded', function() {
             const cursor = document.getElementById('cursor');
+            const cursorBackup = document.getElementById('cursor-backup');
             const inputField = document.getElementById('command-input');
             const progressBar = document.getElementById('progress-bar');
             const progressText = document.getElementById('progress-text');
             const progressContainer = document.getElementById('progress-container');
             const loadingMessage = document.getElementById('loading-message');
+            const movementPath = document.getElementById('movement-path');
+            const debugInfo = document.getElementById('debug-info');
             
-            // Начальные координаты курсора (вне экрана)
+            // Начальные координаты курсора (вне экрана слева)
             let cursorX = -100;
             let cursorY = window.innerHeight / 2;
             
-            // Финальные координаты (центр поля ввода)
+            // Точки маршрута:
+            // 1. Центр экрана
+            const centerX = window.innerWidth / 2;
+            const centerY = window.innerHeight / 2;
+            
+            // 2. Конечная точка (500px налево от центра)
+            const finalX = centerX - 500;
+            const finalY = centerY;
+            
+            // Поле ввода находится в конечной точке
             const inputRect = inputField.getBoundingClientRect();
-            const targetX = inputRect.left + inputRect.width / 2 - 10;
-            const targetY = inputRect.top + inputRect.height / 2 - 15;
+            const targetX = finalX;
+            const targetY = finalY;
+            
+            // Обновляем позицию поля ввода чтобы оно было в конечной точке курсора
+            const loadingContent = document.querySelector('.loading-content');
+            loadingContent.style.transform = `translateX(500px)`; // Сдвигаем контент вправо
+            
+            // Функция для отображения точек пути (для отладки)
+            function showPathPoints() {
+                const points = [
+                    {x: cursorX, y: cursorY, label: 'Старт'},
+                    {x: centerX, y: centerY, label: 'Центр'},
+                    {x: finalX, y: finalY, label: 'Конец'}
+                ];
+                
+                points.forEach(point => {
+                    const dot = document.createElement('div');
+                    dot.className = 'path-point';
+                    dot.style.left = point.x + 'px';
+                    dot.style.top = point.y + 'px';
+                    dot.title = point.label;
+                    movementPath.appendChild(dot);
+                });
+            }
+            
+            // Функция для обновления отладочной информации
+            function updateDebugInfo(x, y, stage) {
+                debugInfo.innerHTML = `
+                    Stage: ${stage}<br>
+                    X: ${Math.round(x)}<br>
+                    Y: ${Math.round(y)}<br>
+                    Center: ${Math.round(centerX)}, ${Math.round(centerY)}<br>
+                    Final: ${Math.round(finalX)}, ${Math.round(finalY)}
+                `;
+            }
             
             // Функция для плавного движения курсора
             function moveCursorTo(x, y, duration, callback) {
                 cursor.style.opacity = '1';
+                cursorBackup.style.opacity = '1';
                 
                 const startX = cursorX;
                 const startY = cursorY;
@@ -261,7 +363,7 @@
                     const elapsed = currentTime - startTime;
                     const progress = Math.min(elapsed / duration, 1);
                     
-                    // Эasing функция для плавности
+                    // Easing функция для плавности
                     const easeProgress = 1 - Math.pow(1 - progress, 3);
                     
                     cursorX = startX + (x - startX) * easeProgress;
@@ -269,6 +371,10 @@
                     
                     cursor.style.left = cursorX + 'px';
                     cursor.style.top = cursorY + 'px';
+                    cursorBackup.style.left = cursorX + 'px';
+                    cursorBackup.style.top = cursorY + 'px';
+                    
+                    updateDebugInfo(cursorX, cursorY, 'Moving');
                     
                     if (progress < 1) {
                         requestAnimationFrame(animate);
@@ -283,8 +389,10 @@
             // Функция для анимации клика
             function animateClick(callback) {
                 cursor.style.animation = 'click 0.3s ease-in-out';
+                cursorBackup.style.animation = 'click 0.3s ease-in-out';
                 setTimeout(() => {
                     cursor.style.animation = '';
+                    cursorBackup.style.animation = '';
                     if (callback) callback();
                 }, 300);
             }
@@ -324,19 +432,32 @@
             
             // Основная последовательность анимаций
             function startLoadingAnimation() {
-                // 1. Движение курсора к полю ввода
+                showPathPoints();
+                updateDebugInfo(cursorX, cursorY, 'Starting');
+                
+                // 1. Движение курсора к центру экрана
                 setTimeout(() => {
-                    moveCursorTo(targetX, targetY, 2000, () => {
-                        // 2. Анимация клика
+                    moveCursorTo(centerX, centerY, 2000, () => {
+                        updateDebugInfo(cursorX, cursorY, 'Reached Center');
+                        
+                        // Пауза в центре
                         setTimeout(() => {
-                            animateClick(() => {
-                                // 3. Ввод текста
+                            // 2. Движение на 500px налево от центра
+                            moveCursorTo(finalX, finalY, 1500, () => {
+                                updateDebugInfo(cursorX, cursorY, 'Reached Final Position');
+                                
+                                // 3. Анимация клика
                                 setTimeout(() => {
-                                    typeText('загрузить на 100%', 100, () => {
-                                        // 4. Начало загрузки
+                                    animateClick(() => {
+                                        // 4. Ввод текста
                                         setTimeout(() => {
-                                            startProgressAnimation();
-                                        }, 1000);
+                                            typeText('загрузить на 100%', 100, () => {
+                                                // 5. Начало загрузки
+                                                setTimeout(() => {
+                                                    startProgressAnimation();
+                                                }, 1000);
+                                            });
+                                        }, 500);
                                     });
                                 }, 500);
                             });
@@ -388,6 +509,15 @@
                 }, 1000);
             }
             
+            // Проверка загрузки курсора
+            setTimeout(() => {
+                if (cursor.complete && cursor.naturalWidth === 0) {
+                    // Курсор не загрузился, используем backup
+                    cursor.style.display = 'none';
+                    cursorBackup.style.display = 'block';
+                }
+            }, 2000);
+            
             // Добавляем CSS для fadeOut анимации
             const style = document.createElement('style');
             style.textContent = `
@@ -400,15 +530,6 @@
             
             // Запускаем анимацию после полной загрузки страницы
             setTimeout(startLoadingAnimation, 500);
-            
-            // Резервный вариант если курсор не загрузится
-            setTimeout(() => {
-                if (cursor.style.opacity === '0') {
-                    cursor.style.backgroundColor = '#ffd54f';
-                    cursor.style.borderRadius = '50%';
-                    cursor.style.boxShadow = '0 0 10px #ffd54f';
-                }
-            }, 3000);
         });
     </script>
 </body>
