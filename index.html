@@ -171,32 +171,6 @@
         .floating-element:nth-child(4) { top: 30%; left: 70%; animation-delay: 3s; }
         .floating-element:nth-child(5) { top: 70%; left: 30%; animation-delay: 4s; }
         
-        .movement-path {
-            position: absolute;
-            top: 0;
-            left: 0;
-            width: 100%;
-            height: 100%;
-            pointer-events: none;
-            z-index: 15;
-        }
-        
-        .path-point {
-            position: absolute;
-            width: 8px;
-            height: 8px;
-            background: rgba(255, 213, 79, 0.5);
-            border-radius: 50%;
-            transform: translate(-50%, -50%);
-        }
-        
-        .path-line {
-            position: absolute;
-            background: rgba(255, 213, 79, 0.3);
-            height: 2px;
-            transform-origin: left center;
-        }
-        
         @keyframes fadeIn {
             from { opacity: 0; transform: translateY(20px); }
             to { opacity: 1; transform: translateY(0); }
@@ -238,19 +212,6 @@
             50% { opacity: 0.7; }
             100% { opacity: 1; }
         }
-        
-        .debug-info {
-            position: fixed;
-            top: 10px;
-            left: 10px;
-            background: rgba(0, 0, 0, 0.7);
-            color: white;
-            padding: 10px;
-            border-radius: 5px;
-            font-size: 12px;
-            font-family: monospace;
-            z-index: 100;
-        }
     </style>
 </head>
 <body>
@@ -265,9 +226,6 @@
             <div class="floating-element">⚙️</div>
             <div class="floating-element">🔧</div>
         </div>
-        
-        <!-- Точки пути для визуализации -->
-        <div class="movement-path" id="movement-path"></div>
         
         <!-- Основной контент -->
         <div class="loading-content">
@@ -291,9 +249,6 @@
         <!-- Курсоры -->
         <div class="cursor" id="cursor"></div>
         <div class="cursor-backup" id="cursor-backup"></div>
-        
-        <!-- Отладочная информация -->
-        <div class="debug-info" id="debug-info"></div>
     </div>
 
     <script>
@@ -305,84 +260,19 @@
             const progressText = document.getElementById('progress-text');
             const progressContainer = document.getElementById('progress-container');
             const loadingMessage = document.getElementById('loading-message');
-            const movementPath = document.getElementById('movement-path');
-            const debugInfo = document.getElementById('debug-info');
             
             // Начальные координаты курсора (вне экрана слева)
             let cursorX = -100;
             let cursorY = window.innerHeight / 2;
             
-            // Точки маршрута:
-            // 1. Центр экрана
+            // Координаты центра экрана
             const centerX = window.innerWidth / 2;
             const centerY = window.innerHeight / 2;
             
-            // 2. На 10px вверх от центра
-            const upX = centerX;
-            const upY = centerY - 10;
-            
-            // 3. На 50px влево от предыдущей позиции
-            const finalX = upX - 50;
-            const finalY = upY;
-            
-            // Поле ввода находится в конечной точке
-            const targetX = finalX;
-            const targetY = finalY;
-            
-            // Обновляем позицию контента чтобы поле ввода было в конечной точке
-            const loadingContent = document.querySelector('.loading-content');
-            loadingContent.style.transform = `translateX(50px)`; // Сдвигаем контент вправо на 50px
-            
-            // Функция для отображения точек пути и линий
-            function showPathPoints() {
-                const points = [
-                    {x: cursorX, y: cursorY, label: 'Старт'},
-                    {x: centerX, y: centerY, label: '1. Центр'},
-                    {x: upX, y: upY, label: '2. Вверх 10px'},
-                    {x: finalX, y: finalY, label: '3. Влево 50px'}
-                ];
-                
-                // Рисуем точки
-                points.forEach(point => {
-                    const dot = document.createElement('div');
-                    dot.className = 'path-point';
-                    dot.style.left = point.x + 'px';
-                    dot.style.top = point.y + 'px';
-                    dot.title = point.label;
-                    movementPath.appendChild(dot);
-                });
-                
-                // Рисуем линии между точками
-                for (let i = 0; i < points.length - 1; i++) {
-                    const start = points[i];
-                    const end = points[i + 1];
-                    
-                    const dx = end.x - start.x;
-                    const dy = end.y - start.y;
-                    const distance = Math.sqrt(dx * dx + dy * dy);
-                    const angle = Math.atan2(dy, dx) * 180 / Math.PI;
-                    
-                    const line = document.createElement('div');
-                    line.className = 'path-line';
-                    line.style.left = start.x + 'px';
-                    line.style.top = start.y + 'px';
-                    line.style.width = distance + 'px';
-                    line.style.transform = `rotate(${angle}deg)`;
-                    movementPath.appendChild(line);
-                }
-            }
-            
-            // Функция для обновления отладочной информации
-            function updateDebugInfo(x, y, stage) {
-                debugInfo.innerHTML = `
-                    Stage: ${stage}<br>
-                    X: ${Math.round(x)}<br>
-                    Y: ${Math.round(y)}<br>
-                    Center: ${Math.round(centerX)}, ${Math.round(centerY)}<br>
-                    Up: ${Math.round(upX)}, ${Math.round(upY)}<br>
-                    Final: ${Math.round(finalX)}, ${Math.round(finalY)}
-                `;
-            }
+            // Координаты поля ввода
+            const inputRect = inputField.getBoundingClientRect();
+            const inputCenterX = inputRect.left + inputRect.width / 2;
+            const inputCenterY = inputRect.top + inputRect.height / 2;
             
             // Функция для плавного движения курсора
             function moveCursorTo(x, y, duration, callback) {
@@ -407,8 +297,6 @@
                     cursor.style.top = cursorY + 'px';
                     cursorBackup.style.left = cursorX + 'px';
                     cursorBackup.style.top = cursorY + 'px';
-                    
-                    updateDebugInfo(cursorX, cursorY, 'Moving');
                     
                     if (progress < 1) {
                         requestAnimationFrame(animate);
@@ -466,26 +354,17 @@
             
             // Основная последовательность анимаций
             function startLoadingAnimation() {
-                showPathPoints();
-                updateDebugInfo(cursorX, cursorY, 'Starting');
-                
                 // 1. Движение курсора к центру экрана
                 setTimeout(() => {
                     moveCursorTo(centerX, centerY, 1500, () => {
-                        updateDebugInfo(cursorX, cursorY, '1. Достигнут центр');
-                        
                         // Пауза в центре
                         setTimeout(() => {
-                            // 2. Движение на 10px вверх
-                            moveCursorTo(upX, upY, 800, () => {
-                                updateDebugInfo(cursorX, cursorY, '2. Поднялся на 10px');
-                                
+                            // 2. Движение к центру поля ввода по высоте
+                            moveCursorTo(centerX, inputCenterY, 1000, () => {
                                 // Пауза
                                 setTimeout(() => {
-                                    // 3. Движение на 50px влево
-                                    moveCursorTo(finalX, finalY, 1000, () => {
-                                        updateDebugInfo(cursorX, cursorY, '3. Сдвинулся на 50px влево');
-                                        
+                                    // 3. Движение к центру поля ввода по горизонтали
+                                    moveCursorTo(inputCenterX, inputCenterY, 1000, () => {
                                         // 4. Анимация клика
                                         setTimeout(() => {
                                             animateClick(() => {
@@ -503,7 +382,7 @@
                                     });
                                 }, 300);
                             });
-                        }, 300);
+                        }, 500);
                     });
                 }, 1000);
             }
