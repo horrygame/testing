@@ -360,11 +360,11 @@
                         // Пауза в центре
                         setTimeout(() => {
                             // 2. Движение к центру поля ввода по высоте
-                            moveCursorTo(centerX, inputCenterY, 35, () => {
+                            moveCursorTo(centerX, inputCenterY, 1000, () => {
                                 // Пауза
                                 setTimeout(() => {
                                     // 3. Движение к центру поля ввода по горизонтали
-                                    moveCursorTo(inputCenterX, inputCenterY-100, () => {
+                                    moveCursorTo(inputCenterX, inputCenterY, 500, () => {
                                         // 4. Анимация клика
                                         setTimeout(() => {
                                             animateClick(() => {
