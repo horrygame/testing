@@ -40,7 +40,6 @@
             flex-direction: column;
             align-items: center;
             justify-content: center;
-            width: 100%;
         }
         
         h1 {
@@ -51,41 +50,32 @@
             opacity: 0;
             animation: fadeIn 1s ease-in-out 0.5s forwards;
             text-align: center;
-            width: 100%;
         }
         
-        .loading-box {
-            width: 400px;
+        .loading-button {
+            width: 200px;
             height: 60px;
-            background: rgba(93, 64, 55, 0.9);
-            border: 3px solid #8d6e63;
+            background: linear-gradient(45deg, #8d6e63, #6d4c41);
+            border: 3px solid #ffd54f;
             border-radius: 10px;
-            position: relative;
+            color: #fff;
+            font-size: 20px;
+            font-weight: bold;
+            cursor: pointer;
             margin: 20px 0;
             box-shadow: 0 8px 25px rgba(0, 0, 0, 0.5);
             opacity: 0;
             animation: fadeIn 1s ease-in-out 1s forwards;
             display: flex;
-            justify-content: center;
             align-items: center;
+            justify-content: center;
+            transition: all 0.3s ease;
+            position: relative;
         }
         
-        .input-field {
-            width: 100%;
-            height: 100%;
-            background: transparent;
-            border: none;
-            outline: none;
-            color: #f5e8c8;
-            font-size: 18px;
-            padding: 0 20px;
-            font-family: 'Times New Roman', serif;
-            text-align: center;
-        }
-        
-        .input-field::placeholder {
-            color: #bcaaa4;
-            text-align: center;
+        .loading-button:hover {
+            background: linear-gradient(45deg, #a1887f, #8d6e63);
+            transform: translateY(-2px);
         }
         
         .cursor {
@@ -116,41 +106,43 @@
         
         .progress-container {
             width: 400px;
-            height: 20px;
+            height: 30px;
             background: rgba(93, 64, 55, 0.8);
             border: 2px solid #8d6e63;
-            border-radius: 10px;
+            border-radius: 15px;
             margin-top: 30px;
             overflow: hidden;
             opacity: 0;
-            display: flex;
-            justify-content: center;
-            align-items: center;
+            position: relative;
         }
         
         .progress-bar {
             width: 0%;
             height: 100%;
             background: linear-gradient(90deg, #ffd54f, #ffb300);
-            border-radius: 8px;
+            border-radius: 13px;
             transition: width 0.3s ease;
             position: relative;
-            display: flex;
-            justify-content: center;
-            align-items: center;
         }
         
-        .progress-text {
+        .running-text {
             position: absolute;
-            top: 50%;
-            left: 50%;
-            transform: translate(-50%, -50%);
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            display: flex;
+            align-items: center;
+            justify-content: center;
             color: #5d4037;
             font-weight: bold;
             font-size: 14px;
-            text-shadow: 1px 1px 2px rgba(255, 255, 255, 0.5);
-            text-align: center;
-            width: 100%;
+            white-space: nowrap;
+            overflow: hidden;
+        }
+        
+        .running-text-content {
+            animation: runningText 15s linear infinite;
         }
         
         .loading-message {
@@ -159,9 +151,6 @@
             color: #d7ccc8;
             opacity: 0;
             text-align: center;
-            width: 100%;
-            max-width: 600px;
-            line-height: 1.5;
         }
         
         .medieval-decoration {
@@ -207,9 +196,13 @@
             50% { transform: scale(0.7); }
         }
         
-        @keyframes typewriter {
-            from { width: 0; }
-            to { width: 100%; }
+        @keyframes runningText {
+            0% {
+                transform: translateX(-100%);
+            }
+            100% {
+                transform: translateX(100%);
+            }
         }
         
         .completed-text {
@@ -231,6 +224,11 @@
             opacity: 1 !important;
             animation: fadeIn 1s ease-in-out forwards !important;
         }
+        
+        .button-text {
+            position: relative;
+            z-index: 2;
+        }
     </style>
 </head>
 <body>
@@ -250,13 +248,17 @@
         <div class="loading-content">
             <h1>🤖 Программирование Робота</h1>
             
-            <div class="loading-box" id="input-container">
-                <input type="text" class="input-field" id="command-input" placeholder="Введите команду загрузки..." readonly>
+            <div class="loading-button" id="load-button">
+                <span class="button-text">Загрузка</span>
             </div>
             
             <div class="progress-container" id="progress-container">
                 <div class="progress-bar" id="progress-bar">
-                    <div class="progress-text" id="progress-text">0%</div>
+                    <div class="running-text">
+                        <div class="running-text-content" id="running-text">
+                            Инициализация системы • Загрузка модулей • Оптимизация кода • Подготовка уровней • Настройка интерфейса • Проверка ресурсов •
+                        </div>
+                    </div>
                 </div>
             </div>
             
@@ -274,25 +276,27 @@
         document.addEventListener('DOMContentLoaded', function() {
             const cursor = document.getElementById('cursor');
             const cursorBackup = document.getElementById('cursor-backup');
-            const inputField = document.getElementById('command-input');
+            const loadButton = document.getElementById('load-button');
             const progressBar = document.getElementById('progress-bar');
-            const progressText = document.getElementById('progress-text');
             const progressContainer = document.getElementById('progress-container');
             const loadingMessage = document.getElementById('loading-message');
+            const runningText = document.getElementById('running-text');
             
             // Начальные координаты курсора (вне экрана слева)
             let cursorX = -100;
             let cursorY = window.innerHeight / 2;
             
-            // Координаты центра поля ввода
-            const inputRect = inputField.getBoundingClientRect();
-            const inputCenterX = inputRect.left + inputRect.width / 2;
-            const inputCenterY = inputRect.top + inputRect.height / 2;
+            // Координаты центра кнопки
+            const buttonRect = loadButton.getBoundingClientRect();
+            const buttonCenterX = buttonRect.left + buttonRect.width / 2;
+            const buttonCenterY = buttonRect.top + buttonRect.height / 2;
             
             // Функция для показа строки загрузки
             function showLoadingElements() {
                 progressContainer.classList.add('show-loading');
                 loadingMessage.classList.add('show-loading');
+                // Запускаем бегущую строку
+                runningText.style.animation = 'runningText 15s linear infinite';
             }
             
             // Функция для плавного движения курсора
@@ -333,35 +337,22 @@
             function animateClick(callback) {
                 cursor.style.animation = 'click 0.3s ease-in-out';
                 cursorBackup.style.animation = 'click 0.3s ease-in-out';
+                // Анимация кнопки при клике
+                loadButton.style.transform = 'scale(0.95)';
+                loadButton.style.background = 'linear-gradient(45deg, #6d4c41, #5d4037)';
+                
                 setTimeout(() => {
                     cursor.style.animation = '';
                     cursorBackup.style.animation = '';
+                    loadButton.style.transform = 'scale(1)';
+                    loadButton.style.background = 'linear-gradient(45deg, #8d6e63, #6d4c41)';
                     if (callback) callback();
                 }, 300);
-            }
-            
-            // Функция для ввода текста
-            function typeText(text, speed, callback) {
-                let i = 0;
-                inputField.placeholder = '';
-                
-                function type() {
-                    if (i < text.length) {
-                        inputField.placeholder += text.charAt(i);
-                        i++;
-                        setTimeout(type, speed);
-                    } else {
-                        if (callback) callback();
-                    }
-                }
-                
-                type();
             }
             
             // Функция для обновления прогресса
             function updateProgress(percent, message) {
                 progressBar.style.width = percent + '%';
-                progressText.textContent = percent + '%';
                 
                 if (message) {
                     loadingMessage.textContent = message;
@@ -370,28 +361,31 @@
                 if (percent === 100) {
                     progressBar.classList.add('pulse');
                     loadingMessage.innerHTML = '<span class="completed-text">✓ Загрузка завершена! Начинаем путешествие...</span>';
+                    // Останавливаем бегущую строку
+                    runningText.style.animation = 'none';
                 }
             }
             
             // Основная последовательность анимаций
             function startLoadingAnimation() {
-                // 1. ОДНО движение курсора к центру поля ввода
+                // 1. Движение курсора к центру кнопки
                 setTimeout(() => {
-                    moveCursorTo(inputCenterX, inputCenterY, 2000, () => {
+                    moveCursorTo(buttonCenterX, buttonCenterY, 2000, () => {
                         // 2. Анимация клика
                         setTimeout(() => {
                             animateClick(() => {
                                 // ПОКАЗЫВАЕМ СТРОКУ ЗАГРУЗКИ ПОСЛЕ КЛИКА
                                 showLoadingElements();
                                 
-                                // 3. Ввод текста
+                                // 3. Меняем текст кнопки
                                 setTimeout(() => {
-                                    typeText('загрузить на 100%', 100, () => {
-                                        // 4. Начало загрузки
-                                        setTimeout(() => {
-                                            startProgressAnimation();
-                                        }, 1000);
-                                    });
+                                    loadButton.querySelector('.button-text').textContent = 'Загрузка...';
+                                    loadButton.style.cursor = 'default';
+                                    
+                                    // 4. Начало загрузки
+                                    setTimeout(() => {
+                                        startProgressAnimation();
+                                    }, 1000);
                                 }, 500);
                             });
                         }, 500);
