@@ -112,7 +112,6 @@
             margin-top: 30px;
             overflow: hidden;
             opacity: 0;
-            animation: fadeIn 1s ease-in-out 5s forwards;
         }
         
         .progress-bar {
@@ -140,7 +139,6 @@
             font-size: 18px;
             color: #d7ccc8;
             opacity: 0;
-            animation: fadeIn 1s ease-in-out 5.5s forwards;
         }
         
         .medieval-decoration {
@@ -195,7 +193,6 @@
             overflow: hidden;
             border-right: 2px solid #ffd54f;
             white-space: nowrap;
-            animation: typewriter 2s steps(20) 4s forwards;
         }
         
         .completed-text {
@@ -211,6 +208,11 @@
             0% { opacity: 1; }
             50% { opacity: 0.7; }
             100% { opacity: 1; }
+        }
+        
+        .show-loading {
+            opacity: 1 !important;
+            animation: fadeIn 1s ease-in-out forwards !important;
         }
     </style>
 </head>
@@ -265,14 +267,16 @@
             let cursorX = -100;
             let cursorY = window.innerHeight / 2;
             
-            // Координаты центра экрана
-            const centerX = window.innerWidth / 2;
-            const centerY = window.innerHeight / 2;
-            
-            // Координаты поля ввода
+            // Координаты центра поля ввода
             const inputRect = inputField.getBoundingClientRect();
             const inputCenterX = inputRect.left + inputRect.width / 2;
             const inputCenterY = inputRect.top + inputRect.height / 2;
+            
+            // Функция для показа строки загрузки
+            function showLoadingElements() {
+                progressContainer.classList.add('show-loading');
+                loadingMessage.classList.add('show-loading');
+            }
             
             // Функция для плавного движения курсора
             function moveCursorTo(x, y, duration, callback) {
@@ -354,29 +358,24 @@
             
             // Основная последовательность анимаций
             function startLoadingAnimation() {
-                // 1. Движение курсора к центру экрана
+                // 1. ОДНО движение курсора к центру поля ввода
                 setTimeout(() => {
-                    moveCursorTo(centerX, centerY+100, 1500, () => {
-                        // Пауза в центре
+                    moveCursorTo(inputCenterX, inputCenterY, 2000, () => {
+                        // 2. Анимация клика
                         setTimeout(() => {
-
-  
-                                        // 4. Анимация клика
+                            animateClick(() => {
+                                // ПОКАЗЫВАЕМ СТРОКУ ЗАГРУЗКИ ПОСЛЕ КЛИКА
+                                showLoadingElements();
+                                
+                                // 3. Ввод текста
+                                setTimeout(() => {
+                                    typeText('загрузить на 100%', 100, () => {
+                                        // 4. Начало загрузки
                                         setTimeout(() => {
-                                            animateClick(() => {
-                                                // 5. Ввод текста
-                                                setTimeout(() => {
-                                                    typeText('загрузить на 100%', 100, () => {
-                                                        // 6. Начало загрузки
-                                                        setTimeout(() => {
-                                                            startProgressAnimation();
-                                                        }, 1000);
-                                                    });
-                                                }, 500);
-                                            });
-                                        }, 500);
+                                            startProgressAnimation();
+                                        }, 1000);
                                     });
-                                }, 300);
+                                }, 500);
                             });
                         }, 500);
                     });
