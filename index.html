@@ -125,7 +125,7 @@
             position: relative;
         }
         
-        .running-text {
+        .progress-percent {
             position: absolute;
             top: 0;
             left: 0;
@@ -136,13 +136,9 @@
             justify-content: center;
             color: #5d4037;
             font-weight: bold;
-            font-size: 14px;
-            white-space: nowrap;
-            overflow: hidden;
-        }
-        
-        .running-text-content {
-            animation: runningText 15s linear infinite;
+            font-size: 16px;
+            text-shadow: 1px 1px 2px rgba(255, 255, 255, 0.5);
+            z-index: 2;
         }
         
         .loading-message {
@@ -196,15 +192,6 @@
             50% { transform: scale(0.7); }
         }
         
-        @keyframes runningText {
-            0% {
-                transform: translateX(-100%);
-            }
-            100% {
-                transform: translateX(100%);
-            }
-        }
-        
         .completed-text {
             color: #4caf50;
             font-weight: bold;
@@ -254,11 +241,7 @@
             
             <div class="progress-container" id="progress-container">
                 <div class="progress-bar" id="progress-bar">
-                    <div class="running-text">
-                        <div class="running-text-content" id="running-text">
-                            Инициализация системы • Загрузка модулей • Оптимизация кода • Подготовка уровней • Настройка интерфейса • Проверка ресурсов •
-                        </div>
-                    </div>
+                    <div class="progress-percent" id="progress-percent">0%</div>
                 </div>
             </div>
             
@@ -278,9 +261,9 @@
             const cursorBackup = document.getElementById('cursor-backup');
             const loadButton = document.getElementById('load-button');
             const progressBar = document.getElementById('progress-bar');
+            const progressPercent = document.getElementById('progress-percent');
             const progressContainer = document.getElementById('progress-container');
             const loadingMessage = document.getElementById('loading-message');
-            const runningText = document.getElementById('running-text');
             
             // Начальные координаты курсора (вне экрана слева)
             let cursorX = -100;
@@ -295,8 +278,6 @@
             function showLoadingElements() {
                 progressContainer.classList.add('show-loading');
                 loadingMessage.classList.add('show-loading');
-                // Запускаем бегущую строку
-                runningText.style.animation = 'runningText 15s linear infinite';
             }
             
             // Функция для плавного движения курсора
@@ -353,6 +334,7 @@
             // Функция для обновления прогресса
             function updateProgress(percent, message) {
                 progressBar.style.width = percent + '%';
+                progressPercent.textContent = percent + '%';
                 
                 if (message) {
                     loadingMessage.textContent = message;
@@ -361,8 +343,6 @@
                 if (percent === 100) {
                     progressBar.classList.add('pulse');
                     loadingMessage.innerHTML = '<span class="completed-text">✓ Загрузка завершена! Начинаем путешествие...</span>';
-                    // Останавливаем бегущую строку
-                    runningText.style.animation = 'none';
                 }
             }
             
@@ -370,7 +350,7 @@
             function startLoadingAnimation() {
                 // 1. Движение курсора к центру кнопки
                 setTimeout(() => {
-                    moveCursorTo(buttonCenterX-5, buttonCenterY-32, 2000, () => {
+                    moveCursorTo(buttonCenterX, buttonCenterY, 2000, () => {
                         // 2. Анимация клика
                         setTimeout(() => {
                             animateClick(() => {
