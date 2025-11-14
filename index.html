@@ -217,6 +217,17 @@
             opacity: 1 !important;
             animation: fadeIn 1s ease-in-out forwards !important;
         }
+        
+        /* Стиль для визуализации конечной точки курсора */
+        .final-position-marker {
+            position: absolute;
+            width: 10px;
+            height: 10px;
+            background: rgba(255, 0, 0, 0.7);
+            border-radius: 50%;
+            z-index: 25;
+            pointer-events: none;
+        }
     </style>
 </head>
 <body>
@@ -254,6 +265,9 @@
         <!-- Курсоры -->
         <div class="cursor" id="cursor"></div>
         <div class="cursor-backup" id="cursor-backup"></div>
+        
+        <!-- Маркер конечной позиции курсора (для визуализации) -->
+        <div class="final-position-marker" id="final-marker"></div>
     </div>
 
     <script>
@@ -265,6 +279,7 @@
             const progressText = document.getElementById('progress-text');
             const progressContainer = document.getElementById('progress-container');
             const loadingMessage = document.getElementById('loading-message');
+            const finalMarker = document.getElementById('final-marker');
             
             // Начальные координаты курсора (вне экрана слева)
             let cursorX = -100;
@@ -278,6 +293,15 @@
             const inputRect = inputField.getBoundingClientRect();
             const inputCenterX = inputRect.left + inputRect.width / 2;
             const inputCenterY = inputRect.top + inputRect.height / 2;
+            
+            // === ИЗМЕНЕНИЕ: Сместили финальное положение курсора на 10px вверх ===
+            // Было: inputCenterY
+            // Стало: inputCenterY - 10
+            const finalCursorY = inputCenterY - 10; // ← ЗДЕСЬ БЫЛО СДЕЛАНО ИЗМЕНЕНИЕ
+            
+            // Показываем маркер конечной позиции
+            finalMarker.style.left = inputCenterX + 'px';
+            finalMarker.style.top = finalCursorY + 'px';
             
             // Функция для показа строки загрузки
             function showLoadingElements() {
@@ -371,12 +395,13 @@
                         // Пауза в центре
                         setTimeout(() => {
                             // 2. Движение ВВЕРХ (увеличено в 2 раза - 200px вверх)
-                            const upY = centerY - 50; // Движение вверх на 200px
+                            const upY = centerY - 200; // Движение вверх на 200px
                             moveCursorTo(centerX, upY, 2000, () => { // Увеличили время в 2 раза
                                 // Пауза вверху
                                 setTimeout(() => {
-                                    // 3. Движение к центру поля ввода по горизонтали
-                                    moveCursorTo(inputCenterX, inputCenterY, 800, () => {
+                                    // 3. Движение к центру поля ввода по горизонтали и СМЕЩЕННОЙ ВЕРТИКАЛИ
+                                    // === ИЗМЕНЕНИЕ: Используем finalCursorY вместо inputCenterY ===
+                                    moveCursorTo(inputCenterX, finalCursorY, 1000, () => { // ← ЗДЕСЬ БЫЛО СДЕЛАНО ИЗМЕНЕНИЕ
                                         // 4. Анимация клика
                                         setTimeout(() => {
                                             animateClick(() => {
@@ -440,7 +465,7 @@
             function transitionToMainGame() {
                 document.body.style.animation = 'fadeOut 1s ease-in-out forwards';
                 setTimeout(() => {
-                    alert("Переход к основной игре! (Здесь будет подключение к вашему основному коду)");
+                    alert("Переход к основной игре! (Здесь будет подключение к вашему основному коду)\n\nФинальная позиция курсора смещена на 10px вверх относительно центра поля ввода.");
                     // window.location.href = "main-game.html"; // Раскомментируйте для реального перехода
                 }, 1000);
             }
