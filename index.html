@@ -112,7 +112,7 @@
             margin-top: 30px;
             overflow: hidden;
             opacity: 0;
-            animation: fadeIn 1s ease-in-out 5s forwards;
+            /* Убрали автоматическое появление - теперь появляется после клика */
         }
         
         .progress-bar {
@@ -140,7 +140,7 @@
             font-size: 18px;
             color: #d7ccc8;
             opacity: 0;
-            animation: fadeIn 1s ease-in-out 5.5s forwards;
+            /* Убрали автоматическое появление - теперь появляется после клика */
         }
         
         .medieval-decoration {
@@ -212,6 +212,11 @@
             50% { opacity: 0.7; }
             100% { opacity: 1; }
         }
+        
+        .show-loading {
+            opacity: 1 !important;
+            animation: fadeIn 1s ease-in-out forwards !important;
+        }
     </style>
 </head>
 <body>
@@ -273,6 +278,12 @@
             const inputRect = inputField.getBoundingClientRect();
             const inputCenterX = inputRect.left + inputRect.width / 2;
             const inputCenterY = inputRect.top + inputRect.height / 2;
+            
+            // Функция для показа строки загрузки
+            function showLoadingElements() {
+                progressContainer.classList.add('show-loading');
+                loadingMessage.classList.add('show-loading');
+            }
             
             // Функция для плавного движения курсора
             function moveCursorTo(x, y, duration, callback) {
@@ -359,15 +370,19 @@
                     moveCursorTo(centerX, centerY, 1500, () => {
                         // Пауза в центре
                         setTimeout(() => {
-                            // 2. Движение к центру поля ввода по высоте
-                            moveCursorTo(centerX, inputCenterY, 1000, () => {
-                                // Пауза
+                            // 2. Движение ВВЕРХ (увеличено в 2 раза - 200px вверх)
+                            const upY = centerY - 200; // Движение вверх на 200px
+                            moveCursorTo(centerX, upY, 2000, () => { // Увеличили время в 2 раза
+                                // Пауза вверху
                                 setTimeout(() => {
                                     // 3. Движение к центру поля ввода по горизонтали
                                     moveCursorTo(inputCenterX, inputCenterY, 1000, () => {
                                         // 4. Анимация клика
                                         setTimeout(() => {
                                             animateClick(() => {
+                                                // ПОКАЗЫВАЕМ СТРОКУ ЗАГРУЗКИ ПОСЛЕ КЛИКА
+                                                showLoadingElements();
+                                                
                                                 // 5. Ввод текста
                                                 setTimeout(() => {
                                                     typeText('загрузить на 100%', 100, () => {
