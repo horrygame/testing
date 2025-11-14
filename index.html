@@ -1,4 +1,4 @@
-з<!DOCTYPE html>
+<!DOCTYPE html>
 <html lang="ru">
 <head>
     <meta charset="UTF-8">
@@ -36,6 +36,11 @@
             text-align: center;
             z-index: 10;
             position: relative;
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            justify-content: center;
+            width: 100%;
         }
         
         h1 {
@@ -45,6 +50,8 @@
             text-shadow: 3px 3px 5px rgba(0, 0, 0, 0.7);
             opacity: 0;
             animation: fadeIn 1s ease-in-out 0.5s forwards;
+            text-align: center;
+            width: 100%;
         }
         
         .loading-box {
@@ -58,6 +65,9 @@
             box-shadow: 0 8px 25px rgba(0, 0, 0, 0.5);
             opacity: 0;
             animation: fadeIn 1s ease-in-out 1s forwards;
+            display: flex;
+            justify-content: center;
+            align-items: center;
         }
         
         .input-field {
@@ -75,6 +85,7 @@
         
         .input-field::placeholder {
             color: #bcaaa4;
+            text-align: center;
         }
         
         .cursor {
@@ -112,6 +123,9 @@
             margin-top: 30px;
             overflow: hidden;
             opacity: 0;
+            display: flex;
+            justify-content: center;
+            align-items: center;
         }
         
         .progress-bar {
@@ -121,6 +135,9 @@
             border-radius: 8px;
             transition: width 0.3s ease;
             position: relative;
+            display: flex;
+            justify-content: center;
+            align-items: center;
         }
         
         .progress-text {
@@ -132,6 +149,8 @@
             font-weight: bold;
             font-size: 14px;
             text-shadow: 1px 1px 2px rgba(255, 255, 255, 0.5);
+            text-align: center;
+            width: 100%;
         }
         
         .loading-message {
@@ -139,6 +158,10 @@
             font-size: 18px;
             color: #d7ccc8;
             opacity: 0;
+            text-align: center;
+            width: 100%;
+            max-width: 600px;
+            line-height: 1.5;
         }
         
         .medieval-decoration {
@@ -187,12 +210,6 @@
         @keyframes typewriter {
             from { width: 0; }
             to { width: 100%; }
-        }
-        
-        .typewriter-text {
-            overflow: hidden;
-            border-right: 2px solid #ffd54f;
-            white-space: nowrap;
         }
         
         .completed-text {
@@ -360,7 +377,7 @@
             function startLoadingAnimation() {
                 // 1. ОДНО движение курсора к центру поля ввода
                 setTimeout(() => {
-                    moveCursorTo(inputCenterX-172, inputCenterY-32, 2000, () => {
+                    moveCursorTo(inputCenterX, inputCenterY, 2000, () => {
                         // 2. Анимация клика
                         setTimeout(() => {
                             animateClick(() => {
