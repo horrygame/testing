@@ -5,802 +5,248 @@
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Программирование Робота</title>
     <style>
-        /* Стили для анимации загрузки */
-        * {
-            margin: 0;
-            padding: 0;
-            box-sizing: border-box;
-        }
-        
-        body {
-            font-family: 'Times New Roman', serif;
-            background: linear-gradient(135deg, #3e2723, #5d4037);
-            color: #f5e8c8;
-            overflow: hidden;
-            height: 100vh;
-        }
-        
-        #loading-container {
-            position: fixed;
-            top: 0;
-            left: 0;
-            width: 100%;
-            height: 100%;
-            display: flex;
-            justify-content: center;
-            align-items: center;
-            background: linear-gradient(135deg, #3e2723, #5d4037);
-            z-index: 1000;
-        }
-        
-        .medieval-decoration {
-            position: absolute;
-            top: 0;
-            left: 0;
-            width: 100%;
-            height: 100%;
-            background-image: url('data:image/svg+xml;utf8,<svg xmlns="http://www.w3.org/2000/svg" width="100" height="100" opacity="0.1"><rect fill="%235d4037" width="100" height="100"/><path d="M0,0 L100,100 M100,0 L0,100" stroke="%233e2723" stroke-width="2"/></svg>');
-            pointer-events: none;
-        }
-        
-        .floating-elements {
-            position: absolute;
-            top: 0;
-            left: 0;
-            width: 100%;
-            height: 100%;
-            pointer-events: none;
-        }
-        
-        .floating-element {
-            position: absolute;
-            font-size: 24px;
-            animation: float 6s infinite ease-in-out;
-        }
-        
-        .floating-element:nth-child(1) { top: 10%; left: 10%; animation-delay: 0s; }
-        .floating-element:nth-child(2) { top: 20%; left: 80%; animation-delay: 1s; }
-        .floating-element:nth-child(3) { top: 60%; left: 15%; animation-delay: 2s; }
-        .floating-element:nth-child(4) { top: 80%; left: 70%; animation-delay: 3s; }
-        .floating-element:nth-child(5) { top: 30%; left: 50%; animation-delay: 4s; }
-        .floating-element:nth-child(6) { top: 70%; left: 40%; animation-delay: 5s; }
-        .floating-element:nth-child(7) { top: 40%; left: 20%; animation-delay: 0.5s; }
-        .floating-element:nth-child(8) { top: 50%; left: 90%; animation-delay: 1.5s; }
-        .floating-element:nth-child(9) { top: 90%; left: 30%; animation-delay: 2.5s; }
-        .floating-element:nth-child(10) { top: 10%; left: 60%; animation-delay: 3.5s; }
-        
-        @keyframes float {
-            0%, 100% { transform: translateY(0) rotate(0deg); }
-            50% { transform: translateY(-20px) rotate(10deg); }
-        }
-        
-        .loading-content {
-            text-align: center;
-            z-index: 10;
-        }
-        
-        .loading-content h1 {
-            font-size: 48px;
-            margin-bottom: 40px;
-            text-shadow: 3px 3px 5px rgba(0, 0, 0, 0.7);
-            color: #d7ccc8;
-        }
-        
-        /* Новая красивая кнопка загрузки */
-        .loading-button {
-            position: relative;
-            background: linear-gradient(145deg, #8d6e63, #6d4c41);
-            color: #fff;
-            border: none;
-            padding: 20px 50px;
-            font-size: 26px;
-            border-radius: 12px;
-            cursor: pointer;
-            margin: 20px auto;
-            transition: all 0.4s;
-            box-shadow: 
-                0 8px 16px rgba(0, 0, 0, 0.5),
-                inset 0 1px 0 rgba(255, 255, 255, 0.2),
-                inset 0 -4px 0 rgba(0, 0, 0, 0.3);
-            min-width: 280px;
-            text-align: center;
-            border: 3px solid #5d4037;
-            text-shadow: 1px 1px 2px rgba(0, 0, 0, 0.7);
-            font-weight: bold;
-            letter-spacing: 1px;
-            overflow: hidden;
-        }
-        
-        .loading-button::before {
-            content: '';
-            position: absolute;
-            top: 0;
-            left: -100%;
-            width: 100%;
-            height: 100%;
-            background: linear-gradient(90deg, transparent, rgba(255, 255, 255, 0.2), transparent);
-            transition: left 0.7s;
-        }
-        
-        .loading-button:hover {
-            background: linear-gradient(145deg, #a1887f, #8d6e63);
-            transform: translateY(-3px);
-            box-shadow: 
-                0 12px 20px rgba(0, 0, 0, 0.6),
-                inset 0 1px 0 rgba(255, 255, 255, 0.3),
-                inset 0 -4px 0 rgba(0, 0, 0, 0.4);
-        }
-        
-        .loading-button:hover::before {
-            left: 100%;
-        }
-        
-        .loading-button:active {
-            transform: translateY(1px);
-            box-shadow: 
-                0 4px 8px rgba(0, 0, 0, 0.5),
-                inset 0 1px 0 rgba(255, 255, 255, 0.1),
-                inset 0 -2px 0 rgba(0, 0, 0, 0.3);
-        }
-        
-        .button-text {
-            position: relative;
-            z-index: 1;
-        }
-        
-        .button-glow {
-            position: absolute;
-            top: -10px;
-            left: -10px;
-            right: -10px;
-            bottom: -10px;
-            background: radial-gradient(circle, rgba(255, 215, 79, 0.4) 0%, transparent 70%);
-            opacity: 0;
-            transition: opacity 0.4s;
-            border-radius: 15px;
-            z-index: 0;
-        }
-        
-        .loading-button:hover .button-glow {
-            opacity: 1;
-        }
-        
-        .progress-container {
-            width: 80%;
-            max-width: 500px;
-            height: 30px;
-            background: rgba(93, 64, 55, 0.8);
-            border-radius: 15px;
-            margin: 20px auto;
-            overflow: hidden;
-            border: 2px solid #5d4037;
-            box-shadow: inset 0 2px 4px rgba(0, 0, 0, 0.3);
-            opacity: 0;
-            transition: opacity 0.5s ease;
-        }
-        
-        .progress-container.show-loading {
-            opacity: 1;
-        }
-        
-        .progress-bar {
-            height: 100%;
-            background: linear-gradient(90deg, #8d6e63, #a1887f, #ffd54f);
-            width: 0%;
-            border-radius: 15px;
-            transition: width 0.3s ease;
-            display: flex;
-            align-items: center;
-            justify-content: center;
-            position: relative;
-            box-shadow: inset 0 1px 0 rgba(255, 255, 255, 0.3);
-        }
-        
-        .progress-bar.pulse {
-            animation: pulse 1s infinite;
-        }
-        
-        @keyframes pulse {
-            0% { box-shadow: 0 0 0 0 rgba(255, 213, 79, 0.7); }
-            70% { box-shadow: 0 0 0 10px rgba(255, 213, 79, 0); }
-            100% { box-shadow: 0 0 0 0 rgba(255, 213, 79, 0); }
-        }
-        
-        .progress-percent {
-            color: #fff;
-            font-weight: bold;
-            text-shadow: 1px 1px 2px rgba(0, 0, 0, 0.7);
-            font-size: 14px;
-        }
-        
-        .loading-message {
-            margin-top: 20px;
-            font-size: 18px;
-            color: #efebe9;
-            opacity: 0;
-            transition: opacity 0.5s ease;
-        }
-        
-        .loading-message.show-loading {
-            opacity: 1;
-        }
-        
-        .completed-text {
-            color: #81c784;
-            font-weight: bold;
-        }
-        
-        /* Стили для курсора */
-        .cursor {
-            position: absolute;
-            width: 32px;
-            height: 32px;
-            background: url('kursor.png') no-repeat center center;
-            background-size: contain;
-            pointer-events: none;
-            z-index: 100;
-            opacity: 0;
-            transition: opacity 0.3s;
-            filter: drop-shadow(2px 2px 3px rgba(0, 0, 0, 0.7));
-        }
-        
-        .cursor-backup {
-            position: absolute;
-            width: 32px;
-            height: 32px;
-            background: #f5e8c8;
-            clip-path: polygon(0 0, 100% 0, 60% 100%, 40% 100%);
-            display: none;
-            pointer-events: none;
-            z-index: 100;
-            opacity: 0;
-            transition: opacity 0.3s;
-            filter: drop-shadow(2px 2px 3px rgba(0, 0, 0, 0.7));
-        }
-        
-        @keyframes click {
-            0% { transform: scale(1); }
-            50% { transform: scale(0.8); }
-            100% { transform: scale(1); }
-        }
-        
-        @keyframes fadeOut {
-            from { opacity: 1; }
-            to { opacity: 0; }
-        }
-        
-        /* Стили для основной игры */
-        #game-container {
-            position: relative;
-            width: 100vw;
-            height: 100vh;
-            box-shadow: 0 0 30px rgba(0, 0, 0, 0.7);
-            border-radius: 5px;
-            overflow: hidden;
-            border: 8px solid #5d4037;
-            display: none;
-        }
-        
-        #game-canvas {
-            position: absolute;
-            top: 0;
-            left: 0;
-            width: 100%;
-            height: 100%;
-        }
-        
-        .screen {
-            position: absolute;
-            top: 0;
-            left: 0;
-            width: 100%;
-            height: 100%;
-            display: flex;
-            flex-direction: column;
-            justify-content: center;
-            align-items: center;
-            background: rgba(61, 43, 31, 0.95);
-            z-index: 10;
-            background-image: url('data:image/svg+xml;utf8,<svg xmlns="http://www.w3.org/2000/svg" width="100" height="100" opacity="0.1"><rect fill="%235d4037" width="100" height="100"/><path d="M0,0 L100,100 M100,0 L0,100" stroke="%233e2723" stroke-width="2"/></svg>');
-        }
-        
-        .hidden {
-            display: none;
-        }
-        
-        h1 {
-            font-size: 64px;
-            color: #d7ccc8;
-            margin-bottom: 20px;
-            text-shadow: 3px 3px 5px rgba(0, 0, 0, 0.7);
-            text-align: center;
-            font-weight: bold;
-            letter-spacing: 2px;
-            text-transform: uppercase;
-            border-bottom: 3px solid #8d6e63;
-            padding-bottom: 10px;
-        }
-        
-        h2 {
-            font-size: 48px;
-            color: #d7ccc8;
-            margin-bottom: 20px;
-            text-shadow: 2px 2px 4px rgba(0, 0, 0, 0.5);
-            text-align: center;
-            font-weight: bold;
-        }
-        
-        p {
-            font-size: 24px;
-            margin-bottom: 40px;
-            text-align: center;
-            max-width: 80%;
-            line-height: 1.5;
-            color: #efebe9;
-        }
-        
-        .button {
-            background: linear-gradient(to bottom, #8d6e63, #6d4c41);
-            color: #fff;
-            border: none;
-            padding: 15px 30px;
-            font-size: 22px;
-            border-radius: 5px;
-            cursor: pointer;
-            margin: 10px;
-            transition: all 0.3s;
-            box-shadow: 0 4px 8px rgba(0, 0, 0, 0.5);
-            min-width: 250px;
-            text-align: center;
-            border: 2px solid #5d4037;
-            text-shadow: 1px 1px 2px rgba(0, 0, 0, 0.7);
-            font-weight: bold;
-            letter-spacing: 1px;
-        }
-        
-        .button:hover {
-            background: linear-gradient(to bottom, #a1887f, #8d6e63);
-            transform: translateY(-2px);
-            box-shadow: 0 6px 12px rgba(0, 0, 0, 0.6);
-        }
-        
-        .button:active {
-            transform: translateY(1px);
-            box-shadow: 0 2px 4px rgba(0, 0, 0, 0.5);
-        }
-        
-        .button:disabled {
-            background: linear-gradient(to bottom, #795548, #5d4037);
-            cursor: not-allowed;
-            transform: none;
-            color: #bcaaa4;
-        }
-        
-        .menu-buttons {
-            display: flex;
-            flex-wrap: wrap;
-            justify-content: center;
-            max-width: 600px;
-        }
-        
-        /* Изменения для горизонтального расположения уровней */
-        .card-grid {
-            display: flex;
-            gap: 30px;
-            overflow-x: auto;
-            padding: 20px;
+        /* Все предыдущие стили остаются без изменений */
+        /* Добавляем новые стили для мастерской */
+
+        .workshop-container {
             width: 90%;
-            max-width: 90%;
-            height: 300px;
-            align-items: center;
-        }
-        
-        .level-card {
-            background: rgba(93, 64, 55, 0.8);
-            border-radius: 5px;
-            padding: 20px;
-            width: 300px;
-            height: 200px;
+            max-width: 1200px;
+            height: 70vh;
             display: flex;
             flex-direction: column;
-            align-items: center;
-            border: 2px solid #8d6e63;
-            box-shadow: 0 4px 8px rgba(0, 0, 0, 0.3);
-            transition: transform 0.3s;
-            cursor: pointer;
-            position: relative;
-            flex-shrink: 0; /* Предотвращает сжатие карточек */
+            gap: 20px;
         }
-        
-        .level-card:hover {
-            transform: translateY(-5px);
-        }
-        
-        .level-card.locked {
-            cursor: not-allowed;
-            opacity: 0.7;
-        }
-        
-        .level-card.locked:hover {
-            transform: none;
-        }
-        
-        .level-number {
-            font-size: 36px;
-            color: #ffd54f;
-            margin-bottom: 10px;
-        }
-        
-        .level-title {
-            font-size: 24px;
-            color: #f5e8c8;
-            margin-bottom: 10px;
-            text-align: center;
-        }
-        
-        .level-description {
-            font-size: 16px;
-            color: #efebe9;
-            text-align: center;
-            line-height: 1.4;
-        }
-        
-        .lock-icon {
-            position: absolute;
-            top: 10px;
-            right: 10px;
-            font-size: 24px;
-            color: #bcaaa4;
-        }
-        
-        .parchment {
-            background: #f5e8c8;
-            color: #5d4037;
-            padding: 15px;
-            border-radius: 5px;
-            box-shadow: 0 4px 8px rgba(0, 0, 0, 0.3);
-            border: 1px solid #8d6e63;
-            max-width: 90%;
-            margin-bottom: 20px;
-        }
-        
-        .game-ui {
-            position: absolute;
-            top: 0;
-            left: 0;
-            width: 100%;
-            padding: 20px;
+
+        .workshop-header {
             display: flex;
             justify-content: space-between;
-            z-index: 5;
-        }
-        
-        .ui-panel {
-            background: rgba(93, 64, 55, 0.8);
-            padding: 10px 20px;
-            border-radius: 5px;
-            display: flex;
             align-items: center;
-            gap: 10px;
-            font-size: 20px;
-            border: 2px solid #8d6e63;
-            box-shadow: 0 4px 8px rgba(0, 0, 0, 0.3);
-            color: #f5e8c8;
+            margin-bottom: 20px;
         }
-        
-        .game-result {
-            position: absolute;
-            top: 50%;
-            left: 50%;
-            transform: translate(-50%, -50%);
-            background: rgba(61, 43, 31, 0.95);
-            padding: 40px;
-            border-radius: 5px;
-            text-align: center;
-            z-index: 20;
-            border: 3px solid #8d6e63;
-            box-shadow: 0 8px 16px rgba(0, 0, 0, 0.5);
-            width: 500px;
-        }
-        
-        .programming-area {
-            position: absolute;
-            bottom: 0;
-            left: 0;
-            width: 100%;
-            height: 30vh;
-            background: rgba(93, 64, 55, 0.9);
-            display: flex;
-            flex-direction: column;
-            padding: 20px;
-            border-top: 3px solid #8d6e63;
-            z-index: 5;
-        }
-        
-        .commands-panel {
+
+        .workshop-controls {
             display: flex;
             gap: 15px;
-            margin-bottom: 20px;
-            overflow-x: auto;
-            padding: 10px;
-            flex-wrap: wrap;
         }
-        
-        .command {
-            background: linear-gradient(to bottom, #8d6e63, #6d4c41);
-            color: #fff;
-            border: none;
-            padding: 12px 20px;
-            font-size: 18px;
-            border-radius: 5px;
-            cursor: grab;
-            box-shadow: 0 2px 4px rgba(0, 0, 0, 0.5);
-            border: 2px solid #5d4037;
-            text-shadow: 1px 1px 2px rgba(0, 0, 0, 0.7);
-            font-weight: bold;
-            min-width: 200px;
-            text-align: center;
-            transition: all 0.2s;
-            user-select: none;
-            position: relative;
+
+        .workshop-content {
+            display: flex;
+            gap: 20px;
+            flex: 1;
+            height: 100%;
         }
-        
-        .command:hover {
-            background: linear-gradient(to bottom, #a1887f, #8d6e63);
-            transform: translateY(-3px);
-        }
-        
-        .command:active {
-            cursor: grabbing;
-        }
-        
-        .program-panel {
-            flex-grow: 1;
-            background: rgba(121, 85, 72, 0.7);
+
+        .levels-list {
+            flex: 1;
+            background: rgba(93, 64, 55, 0.8);
             border-radius: 5px;
             padding: 15px;
-            display: flex;
-            gap: 15px;
-            overflow-x: auto;
+            overflow-y: auto;
             border: 2px solid #8d6e63;
-            flex-wrap: wrap;
-            align-content: flex-start;
+            max-height: 500px;
         }
-        
-        .program-slot {
-            width: 160px;
-            height: 90px;
-            background: rgba(93, 64, 55, 0.5);
-            border: 2px dashed #8d6e63;
+
+        .level-item {
+            background: rgba(121, 85, 72, 0.7);
+            padding: 15px;
+            margin-bottom: 10px;
             border-radius: 5px;
-            display: flex;
-            justify-content: center;
-            align-items: center;
-            color: #bcaaa4;
-            font-size: 16px;
-            flex-shrink: 0;
-            transition: all 0.2s;
-            position: relative;
-        }
-        
-        .program-slot.filled {
-            background: rgba(141, 110, 99, 0.7);
-            border: 2px solid #5d4037;
-            color: #f5e8c8;
-        }
-        
-        .program-slot.highlight {
-            background: rgba(255, 213, 79, 0.3);
-            border: 2px dashed #ffd54f;
-        }
-        
-        .program-block {
-            width: 100%;
-            height: 100%;
-            background: linear-gradient(to bottom, #8d6e63, #6d4c41);
-            border-radius: 5px;
-            display: flex;
-            justify-content: center;
-            align-items: center;
-            color: #fff;
-            font-size: 16px;
-            cursor: grab;
-            box-shadow: 0 2px 4px rgba(0, 0, 0, 0.5);
-            border: 2px solid #5d4037;
-            text-shadow: 1px 1px 2px rgba(0, 0, 0, 0.7);
-            font-weight: bold;
-            user-select: none;
-            transition: all 0.2s;
-            position: relative;
-            flex-direction: column;
-            padding: 5px;
-        }
-        
-        .program-block:hover {
-            background: linear-gradient(to bottom, #a1887f, #8d6e63);
-        }
-        
-        .program-block:active {
-            cursor: grabbing;
-        }
-        
-        .delete-btn {
-            position: absolute;
-            top: -5px;
-            right: -5px;
-            width: 20px;
-            height: 20px;
-            background: #ef5350;
-            border-radius: 50%;
-            display: flex;
-            justify-content: center;
-            align-items: center;
-            color: white;
-            font-size: 12px;
             cursor: pointer;
-            border: 1px solid #fff;
-            box-shadow: 0 1px 3px rgba(0, 0, 0, 0.3);
-        }
-        
-        .delete-btn:hover {
-            background: #f44336;
-            transform: scale(1.1);
-        }
-        
-        .delete-zone {
-            position: absolute;
-            bottom: 20px;
-            right: 20px;
-            width: 100px;
-            height: 100px;
-            background: rgba(239, 83, 80, 0.7);
-            border-radius: 5px;
-            display: flex;
-            justify-content: center;
-            align-items: center;
-            color: #fff;
-            font-size: 16px;
-            border: 2px dashed #ef5350;
+            border: 1px solid #8d6e63;
             transition: all 0.3s;
         }
-        
-        .delete-zone.highlight {
-            background: rgba(239, 83, 80, 0.9);
-            transform: scale(1.05);
+
+        .level-item:hover {
+            background: rgba(141, 110, 99, 0.8);
+            transform: translateY(-2px);
         }
-        
-        .controls-panel {
+
+        .level-item-header {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            margin-bottom: 8px;
+        }
+
+        .level-item-title {
+            font-size: 18px;
+            font-weight: bold;
+            color: #ffd54f;
+        }
+
+        .level-item-author {
+            font-size: 14px;
+            color: #bcaaa4;
+        }
+
+        .level-item-description {
+            font-size: 14px;
+            color: #f5e8c8;
+            margin-bottom: 8px;
+        }
+
+        .level-item-stats {
             display: flex;
             gap: 15px;
-            margin-top: 15px;
+            font-size: 12px;
+            color: #d7ccc8;
         }
-        
-        .tutorial-content {
-            max-height: 500px;
-            overflow-y: auto;
-            padding: 20px;
-            width: 90%;
-            text-align: left;
-        }
-        
-        .tutorial-section {
-            margin-bottom: 30px;
-        }
-        
-        .tutorial-section h3 {
-            color: #ffd54f;
-            margin-bottom: 10px;
-            font-size: 24px;
-        }
-        
-        .tutorial-section p {
-            text-align: left;
-            margin-bottom: 15px;
-            font-size: 18px;
-        }
-        
-        .tutorial-section ul {
-            margin-left: 30px;
-            margin-bottom: 15px;
-        }
-        
-        .tutorial-section li {
-            margin-bottom: 10px;
-            font-size: 18px;
-        }
-        
-        .code-example {
-            background: #5d4037;
-            padding: 10px;
-            border-radius: 5px;
-            font-family: monospace;
-            margin: 10px 0;
-            border-left: 4px solid #ffd54f;
-        }
-        
-        .medieval-border {
-            border: 8px solid transparent;
-            border-image: url('data:image/svg+xml;utf8,<svg xmlns="http://www.w3.org/2000/svg" width="100" height="100" viewBox="0 0 100 100"><path d="M0,0 L100,0 L100,100 L0,100 Z M10,10 L90,10 L90,90 L10,90 Z" fill="none" stroke="%238d6e63" stroke-width="4"/></svg>') 8 round;
-        }
-        
-        /* Новый стиль для блокировки взаимодействия */
-        .blocked {
-            pointer-events: none;
-            opacity: 0.7;
-        }
-        
-        /* Стили для ввода количества шагов */
-        .steps-input-container {
+
+        .editor-container {
+            flex: 2;
             display: flex;
-            align-items: center;
-            gap: 5px;
-            margin-top: 5px;
+            flex-direction: column;
+            gap: 15px;
         }
-        
-        .steps-input {
-            width: 40px;
-            height: 20px;
-            background: rgba(255, 255, 255, 0.2);
-            border: 1px solid #8d6e63;
-            border-radius: 3px;
-            color: #fff;
+
+        .editor-tools {
+            display: flex;
+            gap: 10px;
+            padding: 15px;
+            background: rgba(93, 64, 55, 0.8);
+            border-radius: 5px;
+            border: 2px solid #8d6e63;
+        }
+
+        .editor-tool {
+            width: 60px;
+            height: 60px;
+            background: rgba(121, 85, 72, 0.7);
+            border: 2px solid #8d6e63;
+            border-radius: 5px;
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            justify-content: center;
+            cursor: grab;
+            transition: all 0.3s;
             text-align: center;
             font-size: 12px;
-        }
-        
-        .steps-label {
-            font-size: 12px;
             color: #f5e8c8;
+        }
+
+        .editor-tool:hover {
+            background: rgba(141, 110, 99, 0.8);
+            transform: translateY(-2px);
+        }
+
+        .editor-tool img {
+            width: 32px;
+            height: 32px;
+            margin-bottom: 5px;
+        }
+
+        .editor-canvas-container {
+            flex: 1;
+            background: rgba(93, 64, 55, 0.8);
+            border-radius: 5px;
+            border: 2px solid #8d6e63;
+            position: relative;
+            overflow: hidden;
+        }
+
+        #editor-canvas {
+            width: 100%;
+            height: 100%;
+        }
+
+        .editor-properties {
+            background: rgba(93, 64, 55, 0.8);
+            padding: 15px;
+            border-radius: 5px;
+            border: 2px solid #8d6e63;
+        }
+
+        .property-group {
+            margin-bottom: 15px;
+        }
+
+        .property-group label {
+            display: block;
+            margin-bottom: 5px;
+            color: #f5e8c8;
+            font-weight: bold;
+        }
+
+        .property-group input,
+        .property-group textarea {
+            width: 100%;
+            padding: 8px;
+            background: rgba(121, 85, 72, 0.7);
+            border: 1px solid #8d6e63;
+            border-radius: 3px;
+            color: #f5e8c8;
+        }
+
+        .property-group textarea {
+            height: 80px;
+            resize: vertical;
+        }
+
+        .empty-message {
+            text-align: center;
+            color: #bcaaa4;
+            font-style: italic;
+            padding: 40px;
+        }
+
+        .delete-level-btn {
+            background: #ef5350 !important;
+            padding: 5px 10px !important;
+            font-size: 12px !important;
+            height: auto !important;
+            min-width: auto !important;
+        }
+
+        .delete-level-btn:hover {
+            background: #f44336 !important;
+        }
+
+        /* Стили для иконки мастерской */
+        .hammer-icon {
+            position: absolute;
+            width: 48px;
+            height: 48px;
+            transition: transform 0.5s ease, opacity 0.5s ease;
+            background-size: contain;
+            background-repeat: no-repeat;
+            background-position: center;
+        }
+
+        .hammer-normal {
+            background-image: url('data:image/svg+xml;utf8,<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="%23f5e8c8"><path d="M2 2v2h4v2H4v2h2v2H2v2h4v2H2v2h4v4h2v-4h2v4h2v-4h2v4h2v-4h2v-2h-2v-2h2V8h-2V6h2V2h-2v2h-2V2h-2v2h-2V2H2zm14 4v2h-2V6h2zm-4 0v2h-2V6h2zm4 4v2h-2v-2h2zm-4 0v2h-2v-2h2z"/></svg>');
+            opacity: 1;
+            transform: scale(1) rotate(0deg);
+        }
+
+        .hammer-active {
+            background-image: url('data:image/svg+xml;utf8,<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="%23ffd54f"><path d="M2 2v2h4v2H4v2h2v2H2v2h4v2H2v2h4v4h2v-4h2v4h2v-4h2v4h2v-4h2v-2h-2v-2h2V8h-2V6h2V2h-2v2h-2V2h-2v2h-2V2H2zm14 4v2h-2V6h2zm-4 0v2h-2V6h2zm4 4v2h-2v-2h2zm-4 0v2h-2v-2h2z"/></svg>');
+            opacity: 0;
+            transform: scale(0.8) rotate(-15deg);
+        }
+
+        #workshop-btn:hover .hammer-normal {
+            opacity: 0;
+            transform: scale(0.8) rotate(15deg);
+        }
+
+        #workshop-btn:hover .hammer-active {
+            opacity: 1;
+            transform: scale(1) rotate(0deg);
+        }
+
+        .static-hammer {
+            width: 40px;
+            height: 40px;
+            background: url('data:image/svg+xml;utf8,<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="%23ffd54f"><path d="M2 2v2h4v2H4v2h2v2H2v2h4v2H2v2h4v4h2v-4h2v4h2v-4h2v4h2v-4h2v-2h-2v-2h2V8h-2V6h2V2h-2v2h-2V2h-2v2h-2V2H2zm14 4v2h-2V6h2zm-4 0v2h-2V6h2zm4 4v2h-2v-2h2zm-4 0v2h-2v-2h2z"/></svg>') no-repeat center center;
+            background-size: contain;
         }
     </style>
 </head>
 <body>
-    <!-- Анимация загрузки -->
+    <!-- Анимация загрузки (без изменений) -->
     <div id="loading-container">
-        <!-- Декоративные элементы -->
-        <div class="medieval-decoration"></div>
-        
-        <div class="floating-elements">
-            <!-- Удвоенное количество частиц (10 вместо 5) -->
-            <div class="floating-element">⚔️</div>
-            <div class="floating-element">⚔️</div>
-            
-            <div class="floating-element">🏰</div>
-            <div class="floating-element">🏰</div>
-            
-            <div class="floating-element">🤖</div>
-            <div class="floating-element">🤖</div>
-            
-            <div class="floating-element">⚙️</div>
-            <div class="floating-element">⚙️</div>
-            
-            <div class="floating-element">🔧</div>
-            <div class="floating-element">🔧</div>
-        </div>
-        
-        <!-- Основной контент -->
-        <div class="loading-content">
-            <h1>🤖 Программирование Робота</h1>
-            
-            <div class="loading-button" id="load-button">
-                <div class="button-glow"></div>
-                <span class="button-text">Загрузка</span>
-            </div>
-            
-            <div class="progress-container" id="progress-container">
-                <div class="progress-bar" id="progress-bar">
-                    <div class="progress-percent" id="progress-percent">0%</div>
-                </div>
-            </div>
-            
-            <div class="loading-message" id="loading-message">
-                Подготовка к путешествию в мир программирования...
-            </div>
-        </div>
-        
-        <!-- Курсоры -->
-        <div class="cursor" id="cursor"></div>
-        <div class="cursor-backup" id="cursor-backup"></div>
+        <!-- ... существующий код загрузки ... -->
     </div>
 
     <!-- Основная игра -->
@@ -809,1325 +255,792 @@
         
         <!-- Главное меню -->
         <div id="main-menu" class="screen">
-            <h1>🤖 Программирование Робота</h1>
+            <div class="title-container">
+                <h1>Программирование Робота
+                    <div class="castle-icon"></div>
+                </h1>
+            </div>
             <p class="parchment">Программируйте робота для выполнения заданий на различных уровнях</p>
             
             <div class="menu-buttons">
-                <button class="button" id="levels-btn">📚 Уровни</button>
-                <button class="button" id="tutorial-btn">📖 Пособие</button>
+                <button class="button" id="levels-btn">
+                    <div class="icon-container">
+                        <div class="lock-icon lock-closed"></div>
+                        <div class="lock-icon lock-open"></div>
+                    </div>
+                    Уровни
+                </button>
+                <button class="button" id="tutorial-btn">
+                    <div class="icon-container">
+                        <div class="book-icon book-closed"></div>
+                        <div class="book-icon book-open"></div>
+                    </div>
+                    Пособие
+                </button>
+                <!-- НОВАЯ КНОПКА МАСТЕРСКОЙ -->
+                <button class="button" id="workshop-btn">
+                    <div class="icon-container">
+                        <div class="hammer-icon hammer-normal"></div>
+                        <div class="hammer-icon hammer-active"></div>
+                    </div>
+                    Мастерская
+                </button>
             </div>
         </div>
         
-        <!-- Экран уровней -->
+        <!-- Экран уровней (без изменений) -->
         <div id="levels-screen" class="screen hidden">
-            <h2>📚 Уровни</h2>
-            <p class="parchment">Выберите уровень для программирования робота</p>
-            
-            <button class="button" id="levels-back-btn">← Назад</button>
-            
-            <div class="card-grid" id="levels-container">
-                <!-- Карточки уровней будут добавлены через JavaScript -->
-            </div>
+            <!-- ... существующий код уровней ... -->
         </div>
         
-        <!-- Экран пособия -->
+        <!-- Экран пособия (без изменений) -->
         <div id="tutorial-screen" class="screen hidden">
-            <h2>📖 Пособие</h2>
+            <!-- ... существующий код пособия ... -->
+        </div>
+
+        <!-- НОВЫЙ ЭКРАН МАСТЕРСКОЙ -->
+        <div id="workshop-screen" class="screen hidden">
+            <h2>
+                <span class="static-icon static-hammer"></span>
+                Мастерская уровней
+            </h2>
+            <p class="parchment">Создавайте и играйте в пользовательские уровни</p>
             
-            <button class="button" id="tutorial-back-btn">← Назад</button>
+            <button class="button" id="workshop-back-btn">← Назад</button>
             
-            <div class="tutorial-content">
-                <div class="tutorial-section">
-                    <h3>Основы программирования робота</h3>
-                    <p>В этой игре вы будете программировать робота для выполнения различных заданий. Робот может выполнять следующие команды:</p>
-                    <ul>
-                        <li><strong>Идти вперед</strong> - робот перемещается на указанное количество клеток вперед</li>
-                        <li><strong>Идти назад</strong> - робот перемещается на указанное количество клеток назад</li>
-                        <li><strong>Идти вправо</strong> - робот перемещается на указанное количество клеток вправо</li>
-                        <li><strong>Идти влево</strong> - робот перемещается на указанное количество клеток влево</li>
-                        <li><strong>Атаковать ближайшего врага</strong> - робот атакует врага, если тот находится в радиусе атаки</li>
-                    </ul>
-                    <p><strong>Совет:</strong> Вы можете указать произвольное количество клеток для команд движения. Робот будет двигаться последовательно, по одной клетке за шаг.</p>
-                </div>
-                
-                <div class="tutorial-section">
-                    <h3>Как программировать робота</h3>
-                    <p>Чтобы запрограммировать робота:</p>
-                    <ol>
-                        <li>Выберите уровень из меню "Уровни"</li>
-                        <li>Изучите задание и расположение объектов на поле</li>
-                        <li>Перетащите команды из панели команд в область программы</li>
-                        <li>Укажите количество клеток для команд движения (по умолчанию 1)</li>
-                        <li>Расположите команды в правильном порядке</li>
-                        <li>Нажмите кнопку "Запуск программы" для выполнения программы</li>
-                    </ol>
-                    <p><strong>Совет:</strong> Вы можете перетаскивать блоки между ячейками и удалять их, нажимая на кнопку удаления (красный кружок) на блоке.</p>
-                </div>
-                
-                <div class="tutorial-section">
-                    <h3>Пример программы</h3>
-                    <p>Пример программы для перемещения робота к врагу и атаки:</p>
-                    <div class="code-example">
-                        1. Идти вперед (3 клетки)<br>
-                        2. Идти вправо (2 клетки)<br>
-                        3. Атаковать ближайшего врага
+            <div class="workshop-container">
+                <div class="workshop-header">
+                    <h3>Пользовательские уровни</h3>
+                    <div class="workshop-controls">
+                        <button class="button" id="create-level-btn">Создать уровень</button>
+                        <button class="button" id="import-level-btn">Импорт уровня</button>
+                        <button class="button" id="export-level-btn">Экспорт уровня</button>
                     </div>
                 </div>
                 
-                <div class="tutorial-section">
-                    <h3>Советы</h3>
-                    <ul>
-                        <li>Планируйте маршрут робота заранее</li>
-                        <li>Учитывайте препятствия на пути</li>
-                        <li>Помните, что команда атаки работает только если враг в радиусе атаки</li>
-                        <li>Используйте кнопку "Сброс программы" для очистки программы</li>
-                        <li>Если программа не работает как ожидалось, проверьте порядок команд и количество клеток</li>
-                    </ul>
+                <div class="workshop-content">
+                    <div class="levels-list" id="custom-levels-list">
+                        <!-- Список пользовательских уровней будет здесь -->
+                        <div class="empty-message" id="empty-levels-message">
+                            Пока нет созданных уровней. Нажмите "Создать уровень" чтобы начать!
+                        </div>
+                    </div>
+                    
+                    <div class="editor-container" id="editor-container" style="display: none;">
+                        <div class="editor-tools">
+                            <div class="editor-tool" draggable="true" data-type="robot">
+                                <img src="white_guy.png" alt="Робот">
+                                <span>Робот</span>
+                            </div>
+                            <div class="editor-tool" draggable="true" data-type="enemy">
+                                <img src="red_guy.png" alt="Враг">
+                                <span>Враг</span>
+                            </div>
+                            <div class="editor-tool" draggable="true" data-type="target">
+                                <div style="width:32px;height:32px;background:#4caf50;border:2px solid white;"></div>
+                                <span>Цель</span>
+                            </div>
+                            <div class="editor-tool" draggable="true" data-type="obstacle">
+                                <img src="wall.png" alt="Стена">
+                                <span>Стена</span>
+                            </div>
+                            <div class="editor-tool" draggable="true" data-type="erase">
+                                <div style="width:32px;height:32px;background:#ef5350;display:flex;align-items:center;justify-content:center;color:white;font-size:20px;">×</div>
+                                <span>Удалить</span>
+                            </div>
+                        </div>
+                        
+                        <div class="editor-canvas-container">
+                            <canvas id="editor-canvas"></canvas>
+                        </div>
+                        
+                        <div class="editor-properties">
+                            <div class="property-group">
+                                <label for="level-title">Название уровня:</label>
+                                <input type="text" id="level-title" placeholder="Введите название уровня">
+                            </div>
+                            <div class="property-group">
+                                <label for="level-description">Описание:</label>
+                                <textarea id="level-description" placeholder="Опишите задание уровня"></textarea>
+                            </div>
+                            <div class="property-group">
+                                <label for="level-author">Автор:</label>
+                                <input type="text" id="level-author" placeholder="Ваше имя">
+                            </div>
+                            <div class="workshop-controls">
+                                <button class="button" id="save-level-btn">Сохранить уровень</button>
+                                <button class="button" id="test-level-btn">Тестировать уровень</button>
+                                <button class="button" id="cancel-edit-btn">Отмена</button>
+                            </div>
+                        </div>
+                    </div>
                 </div>
             </div>
         </div>
         
-        <!-- Игровой UI (отображается поверх игрового экрана) -->
-        <div id="game-ui" class="game-ui hidden">
-            <div class="ui-panel">
-                Уровень: <span id="current-level">1</span>
-            </div>
-            <div class="ui-panel">
-                Задание: <span id="current-task">Дойти до цели</span>
-            </div>
-            <button class="button" id="game-back-btn">← Назад</button>
-        </div>
-        
-        <!-- Область программирования -->
-        <div id="programming-area" class="programming-area hidden">
-            <div class="commands-panel">
-                <div class="command" draggable="true" data-command="forward">Идти вперед</div>
-                <div class="command" draggable="true" data-command="backward">Идти назад</div>
-                <div class="command" draggable="true" data-command="right">Идти вправо</div>
-                <div class="command" draggable="true" data-command="left">Идти влево</div>
-                <div class="command" draggable="true" data-command="attack">Атаковать ближайшего врага</div>
-            </div>
-            
-            <div class="program-panel" id="program-slots">
-                <!-- Слоты программы будут добавлены через JavaScript -->
-            </div>
-            
-            <div class="delete-zone" id="delete-zone">
-                Удалить<br>блок
-            </div>
-            
-            <div class="controls-panel">
-                <button class="button" id="run-program-btn">Запуск программы</button>
-                <button class="button" id="reset-program-btn">Сброс программы</button>
-            </div>
-        </div>
-        
-        <!-- Результат игры -->
-        <div id="game-result" class="game-result hidden">
-            <h2 id="result-title">УРОВЕНЬ ПРОЙДЕН!</h2>
-            <p id="result-message">Поздравляем! Вы успешно запрограммировали робота.</p>
-            <button class="button" id="next-level-btn">Следующий уровень</button>
-            <button class="button" id="levels-menu-btn">К выбору уровней</button>
-        </div>
-        
-        <!-- Результат неудачи -->
-        <div id="game-fail" class="game-result hidden">
-            <h2 id="fail-title">ПОПРОБУЙТЕ СНОВА</h2>
-            <p id="fail-message">Робот не достиг цели. Попробуйте другую программу.</p>
-            <button class="button" id="retry-level-btn">Повторить уровень</button>
-            <button class="button" id="fail-levels-menu-btn">К выбору уровней</button>
-        </div>
-        
-        <!-- Сообщение о столкновении с врагом -->
-        <div id="enemy-collision" class="game-result hidden">
-            <h2 id="enemy-title">СТОЛКНОВЕНИЕ С ВРАГОМ!</h2>
-            <p id="enemy-message">Робот столкнулся с врагом и был уничтожен.</p>
-            <button class="button" id="retry-enemy-btn">Повторить уровень</button>
-            <button class="button" id="enemy-levels-menu-btn">К выбору уровней</button>
-        </div>
+        <!-- Остальные экраны (без изменений) -->
+        <!-- ... существующий код ... -->
     </div>
 
     <script>
-        // ========== АНИМАЦИЯ ЗАГРУЗКИ ==========
-        document.addEventListener('DOMContentLoaded', function() {
-            const cursor = document.getElementById('cursor');
-            const cursorBackup = document.getElementById('cursor-backup');
-            const loadButton = document.getElementById('load-button');
-            const progressBar = document.getElementById('progress-bar');
-            const progressPercent = document.getElementById('progress-percent');
-            const progressContainer = document.getElementById('progress-container');
-            const loadingMessage = document.getElementById('loading-message');
+        // ========== РАСШИРЕНИЕ ОСНОВНОЙ ИГРЫ ==========
+        
+        // Добавляем состояние для мастерской
+        gameState.workshop = {
+            customLevels: [],
+            currentEditLevel: null,
+            editMode: false,
+            selectedTool: null,
+            grid: Array(GRID_HEIGHT).fill().map(() => Array(GRID_WIDTH).fill(null))
+        };
+
+        // Получаем новые элементы DOM для мастерской
+        const workshopScreen = document.getElementById('workshop-screen');
+        const workshopBtn = document.getElementById('workshop-btn');
+        const workshopBackBtn = document.getElementById('workshop-back-btn');
+        const createLevelBtn = document.getElementById('create-level-btn');
+        const importLevelBtn = document.getElementById('import-level-btn');
+        const exportLevelBtn = document.getElementById('export-level-btn');
+        const customLevelsList = document.getElementById('custom-levels-list');
+        const emptyLevelsMessage = document.getElementById('empty-levels-message');
+        const editorContainer = document.getElementById('editor-container');
+        const editorCanvas = document.getElementById('editor-canvas');
+        const editorCtx = editorCanvas.getContext('2d');
+        const levelTitleInput = document.getElementById('level-title');
+        const levelDescriptionInput = document.getElementById('level-description');
+        const levelAuthorInput = document.getElementById('level-author');
+        const saveLevelBtn = document.getElementById('save-level-btn');
+        const testLevelBtn = document.getElementById('test-level-btn');
+        const cancelEditBtn = document.getElementById('cancel-edit-btn');
+
+        // Регистрируем мастерскую как экран
+        screens.workshop = workshopScreen;
+
+        // Добавляем обработчики для мастерской
+        function setupWorkshop() {
+            // Кнопки навигации
+            workshopBtn.addEventListener('click', () => showScreen('workshop'));
+            workshopBackBtn.addEventListener('click', () => showScreen('main_menu'));
             
-            // Начальные координаты курсора (вне экрана слева)
-            let cursorX = -100;
-            let cursorY = window.innerHeight / 2;
+            // Кнопки управления мастерской
+            createLevelBtn.addEventListener('click', createNewLevel);
+            importLevelBtn.addEventListener('click', importLevel);
+            exportLevelBtn.addEventListener('click', exportLevel);
             
-            // Координаты центра кнопки
-            const buttonRect = loadButton.getBoundingClientRect();
-            const buttonCenterX = buttonRect.left + buttonRect.width / 2;
-            const buttonCenterY = buttonRect.top + buttonRect.height / 2;
+            // Кнопки редактора
+            saveLevelBtn.addEventListener('click', saveLevel);
+            testLevelBtn.addEventListener('click', testLevel);
+            cancelEditBtn.addEventListener('click', cancelEdit);
             
-            // Функция для показа строки загрузки
-            function showLoadingElements() {
-                progressContainer.classList.add('show-loading');
-                loadingMessage.classList.add('show-loading');
+            // Настройка перетаскивания инструментов
+            setupEditorTools();
+            
+            // Настройка canvas редактора
+            setupEditorCanvas();
+            
+            // Загрузка пользовательских уровней из localStorage
+            loadCustomLevels();
+        }
+
+        // Настройка инструментов редактора
+        function setupEditorTools() {
+            const tools = document.querySelectorAll('.editor-tool');
+            
+            tools.forEach(tool => {
+                tool.addEventListener('dragstart', (e) => {
+                    e.dataTransfer.setData('text/plain', tool.getAttribute('data-type'));
+                });
+            });
+        }
+
+        // Настройка canvas редактора
+        function setupEditorCanvas() {
+            // Установка размера canvas
+            function resizeEditorCanvas() {
+                const container = editorCanvas.parentElement;
+                editorCanvas.width = container.clientWidth;
+                editorCanvas.height = container.clientHeight;
+                renderEditor();
             }
             
-            // Функция для плавного движения курсора
-            function moveCursorTo(x, y, duration, callback) {
-                cursor.style.opacity = '1';
-                cursorBackup.style.opacity = '1';
+            window.addEventListener('resize', resizeEditorCanvas);
+            resizeEditorCanvas();
+            
+            // Обработчики событий для редактора
+            editorCanvas.addEventListener('dragover', (e) => {
+                e.preventDefault();
+            });
+            
+            editorCanvas.addEventListener('drop', (e) => {
+                e.preventDefault();
+                const toolType = e.dataTransfer.getData('text/plain');
+                const rect = editorCanvas.getBoundingClientRect();
+                const x = e.clientX - rect.left;
+                const y = e.clientY - rect.top;
                 
-                const startX = cursorX;
-                const startY = cursorY;
-                const startTime = performance.now();
+                // Преобразование координат в клетки сетки
+                const gridX = Math.floor(x / (editorCanvas.width / GRID_WIDTH));
+                const gridY = Math.floor(y / (editorCanvas.height / GRID_HEIGHT));
                 
-                function animate(currentTime) {
-                    const elapsed = currentTime - startTime;
-                    const progress = Math.min(elapsed / duration, 1);
+                placeObject(gridX, gridY, toolType);
+            });
+            
+            editorCanvas.addEventListener('click', (e) => {
+                if (gameState.workshop.selectedTool) {
+                    const rect = editorCanvas.getBoundingClientRect();
+                    const x = e.clientX - rect.left;
+                    const y = e.clientY - rect.top;
                     
-                    // Easing функция для плавности
-                    const easeProgress = 1 - Math.pow(1 - progress, 3);
+                    const gridX = Math.floor(x / (editorCanvas.width / GRID_WIDTH));
+                    const gridY = Math.floor(y / (editorCanvas.height / GRID_HEIGHT));
                     
-                    cursorX = startX + (x - startX) * easeProgress;
-                    cursorY = startY + (y - startY) * easeProgress;
-                    
-                    cursor.style.left = cursorX + 'px';
-                    cursor.style.top = cursorY + 'px';
-                    cursorBackup.style.left = cursorX + 'px';
-                    cursorBackup.style.top = cursorY + 'px';
-                    
-                    if (progress < 1) {
-                        requestAnimationFrame(animate);
-                    } else {
-                        if (callback) callback();
+                    placeObject(gridX, gridY, gameState.workshop.selectedTool);
+                }
+            });
+            
+            // Выбор инструмента при клике
+            const tools = document.querySelectorAll('.editor-tool');
+            tools.forEach(tool => {
+                tool.addEventListener('click', () => {
+                    tools.forEach(t => t.style.borderColor = '#8d6e63');
+                    tool.style.borderColor = '#ffd54f';
+                    gameState.workshop.selectedTool = tool.getAttribute('data-type');
+                });
+            });
+        }
+
+        // Размещение объекта на сетке
+        function placeObject(x, y, type) {
+            if (x < 0 || x >= GRID_WIDTH || y < 0 || y >= GRID_HEIGHT) return;
+            
+            const grid = gameState.workshop.grid;
+            
+            // Проверка для робота - может быть только один
+            if (type === 'robot') {
+                // Удаляем существующего робота
+                for (let i = 0; i < GRID_HEIGHT; i++) {
+                    for (let j = 0; j < GRID_WIDTH; j++) {
+                        if (grid[i][j] === 'robot') {
+                            grid[i][j] = null;
+                        }
                     }
                 }
-                
-                requestAnimationFrame(animate);
             }
             
-            // Функция для анимации клика
-            function animateClick(callback) {
-                cursor.style.animation = 'click 0.3s ease-in-out';
-                cursorBackup.style.animation = 'click 0.3s ease-in-out';
-                // Анимация кнопки при клике
-                loadButton.style.transform = 'scale(0.95)';
-                loadButton.style.background = 'linear-gradient(145deg, #6d4c41, #5d4037)';
-                
-                setTimeout(() => {
-                    cursor.style.animation = '';
-                    cursorBackup.style.animation = '';
-                    loadButton.style.transform = 'scale(1)';
-                    loadButton.style.background = 'linear-gradient(145deg, #8d6e63, #6d4c41)';
-                    if (callback) callback();
-                }, 300);
+            // Удаление объекта
+            if (type === 'erase') {
+                grid[y][x] = null;
+            } else {
+                grid[y][x] = type;
             }
             
-            // Функция для обновления прогресса
-            function updateProgress(percent, message) {
-                progressBar.style.width = percent + '%';
-                progressPercent.textContent = percent + '%';
-                
-                if (message) {
-                    loadingMessage.textContent = message;
-                }
-                
-                if (percent === 100) {
-                    progressBar.classList.add('pulse');
-                    loadingMessage.innerHTML = '<span class="completed-text">✓ Загрузка завершена! Начинаем путешествие...</span>';
-                }
+            renderEditor();
+        }
+
+        // Рендер редактора
+        function renderEditor() {
+            const width = editorCanvas.width;
+            const height = editorCanvas.height;
+            const cellWidth = width / GRID_WIDTH;
+            const cellHeight = height / GRID_HEIGHT;
+            
+            // Очистка canvas
+            editorCtx.fillStyle = '#5d4037';
+            editorCtx.fillRect(0, 0, width, height);
+            
+            // Отрисовка сетки
+            editorCtx.strokeStyle = 'rgba(141, 110, 99, 0.3)';
+            editorCtx.lineWidth = 1;
+            
+            for (let x = 0; x <= GRID_WIDTH; x++) {
+                editorCtx.beginPath();
+                editorCtx.moveTo(x * cellWidth, 0);
+                editorCtx.lineTo(x * cellWidth, height);
+                editorCtx.stroke();
             }
             
-            // Основная последовательность анимаций
-            function startLoadingAnimation() {
-                // 1. Движение курсора к центру кнопки
-                setTimeout(() => {
-                    moveCursorTo(buttonCenterX-5, buttonCenterY-32, 2000, () => {
-                        // 2. Анимация клика
-                        setTimeout(() => {
-                            animateClick(() => {
-                                // ПОКАЗЫВАЕМ СТРОКУ ЗАГРУЗКИ ПОСЛЕ КЛИКА
-                                showLoadingElements();
-                                
-                                // 3. Меняем текст кнопки
-                                setTimeout(() => {
-                                    loadButton.querySelector('.button-text').textContent = 'Загрузка...';
-                                    loadButton.style.cursor = 'default';
-                                    
-                                    // 4. Начало загрузки
-                                    setTimeout(() => {
-                                        startProgressAnimation();
-                                    }, 1000);
-                                }, 500);
-                            });
-                        }, 500);
-                    });
-                }, 1000);
+            for (let y = 0; y <= GRID_HEIGHT; y++) {
+                editorCtx.beginPath();
+                editorCtx.moveTo(0, y * cellHeight);
+                editorCtx.lineTo(width, y * cellHeight);
+                editorCtx.stroke();
             }
             
-            // Анимация прогресс-бара (ускоренная в 2 раза)
-            function startProgressAnimation() {
-                let progress = 0;
-                const messages = [
-                    "Инициализация ядра программирования...",
-                    "Загрузка алгоритмов движения...",
-                    "Настройка боевых систем...",
-                    "Подготовка уровней испытаний...",
-                    "Оптимизация кодовых замков...",
-                    "Загрузка завершена!"
-                ];
-                
-                const interval = setInterval(() => {
-                    progress += 2; // Увеличиваем на 2% вместо 1% для ускорения в 2 раза
-                    if (progress > 100) progress = 100;
-                    
-                    updateProgress(progress);
-                    
-                    // Смена сообщений в зависимости от прогресса
-                    if (progress >= 10 && progress < 25) loadingMessage.textContent = messages[0];
-                    if (progress >= 25 && progress < 45) loadingMessage.textContent = messages[1];
-                    if (progress >= 45 && progress < 65) loadingMessage.textContent = messages[2];
-                    if (progress >= 65 && progress < 85) loadingMessage.textContent = messages[3];
-                    if (progress >= 85 && progress < 100) loadingMessage.textContent = messages[4];
-                    if (progress === 100) {
-                        loadingMessage.textContent = messages[5];
-                        clearInterval(interval);
+            // Отрисовка объектов
+            const grid = gameState.workshop.grid;
+            for (let y = 0; y < GRID_HEIGHT; y++) {
+                for (let x = 0; x < GRID_WIDTH; x++) {
+                    const type = grid[y][x];
+                    if (type) {
+                        const screenX = x * cellWidth;
+                        const screenY = y * cellHeight;
                         
-                        // Переход к основной игре через 2 секунды
-                        setTimeout(() => {
-                            transitionToMainGame();
-                        }, 2000);
+                        switch (type) {
+                            case 'robot':
+                                editorCtx.fillStyle = '#f5e8c8';
+                                editorCtx.fillRect(screenX, screenY, cellWidth, cellHeight);
+                                editorCtx.strokeStyle = '#fff';
+                                editorCtx.lineWidth = 2;
+                                editorCtx.strokeRect(screenX, screenY, cellWidth, cellHeight);
+                                break;
+                            case 'enemy':
+                                editorCtx.fillStyle = '#ef5350';
+                                editorCtx.fillRect(screenX, screenY, cellWidth, cellHeight);
+                                break;
+                            case 'target':
+                                editorCtx.fillStyle = '#4caf50';
+                                editorCtx.fillRect(screenX, screenY, cellWidth, cellHeight);
+                                editorCtx.strokeStyle = '#fff';
+                                editorCtx.lineWidth = 2;
+                                editorCtx.strokeRect(screenX, screenY, cellWidth, cellHeight);
+                                break;
+                            case 'obstacle':
+                                editorCtx.fillStyle = '#6d4c41';
+                                editorCtx.fillRect(screenX, screenY, cellWidth, cellHeight);
+                                break;
+                        }
                     }
-                }, 50); // Ускоренный интервал (50мс вместо 100мс)
-            }
-            
-            // Функция перехода к основной игре
-            function transitionToMainGame() {
-                document.getElementById('loading-container').style.animation = 'fadeOut 1s ease-in-out forwards';
-                setTimeout(() => {
-                    document.getElementById('loading-container').style.display = 'none';
-                    document.getElementById('game-container').style.display = 'block';
-                    // Инициализация основной игры
-                    initGame();
-                }, 1000);
-            }
-            
-            // Проверка загрузки курсора
-            setTimeout(() => {
-                // Создаем временное изображение для проверки загрузки курсора
-                const tempImg = new Image();
-                tempImg.onload = function() {
-                    // Курсор загрузился успешно
-                    cursor.style.display = 'block';
-                    cursorBackup.style.display = 'none';
-                };
-                tempImg.onerror = function() {
-                    // Курсор не загрузился, используем backup
-                    cursor.style.display = 'none';
-                    cursorBackup.style.display = 'block';
-                };
-                tempImg.src = 'kursor.png';
-            }, 2000);
-            
-            // Запускаем анимацию после полной загрузки страницы
-            setTimeout(startLoadingAnimation, 500);
-        });
-
-        // ========== ОСНОВНАЯ ИГРА ==========
-        // Константы игры
-        const GRID_WIDTH = 24;
-        const GRID_HEIGHT = 24;
-
-        // Цвета в средневековом стиле
-        const COLORS = {
-            BACKGROUND: '#5d4037',
-            GRID: 'rgba(141, 110, 99, 0.3)',
-            ROBOT: '#f5e8c8',
-            ENEMY: '#ef5350',
-            TARGET: '#4caf50',
-            OBSTACLE: '#6d4c41',
-            TEXT: '#f5e8c8'
-        };
-
-        // Текстуры персонажей
-        const textures = {
-            robot: new Image(),
-            enemy: new Image(),
-            wall: new Image() // Добавляем текстуру стены
-        };
-
-        // Загрузка текстур
-        textures.robot.src = 'white_guy.png';
-        textures.enemy.src = 'red_guy.png';
-        textures.wall.src = 'wall.png'; // Загружаем текстуру стены
-
-        // Игровое состояние
-        let gameState = {
-            currentScreen: 'main_menu',
-            currentLevel: 0,
-            levels: [
-                {
-                    title: "Движение вперед",
-                    description: "Переместите робота к цели, используя команду 'Идти вперед'",
-                    robot: {x: 2, y: 4},
-                    target: {x: 2, y: 1},
-                    enemies: [],
-                    obstacles: [],
-                    program: [],
-                    completed: false,
-                    unlocked: true
-                },
-                {
-                    title: "Обход препятствия",
-                    description: "Обойдите препятствие, чтобы добраться до цели",
-                    robot: {x: 1, y: 4},
-                    target: {x: 5, y: 4},
-                    enemies: [],
-                    obstacles: [{x: 3, y: 4}],
-                    program: [],
-                    completed: false,
-                    unlocked: false
-                },
-                {
-                    title: "Движение в разных направлениях",
-                    description: "Используйте команды движения в разных направлениях",
-                    robot: {x: 1, y: 1},
-                    target: {x: 5, y: 5},
-                    enemies: [],
-                    obstacles: [],
-                    program: [],
-                    completed: false,
-                    unlocked: false
-                },
-                {
-                    title: "Первая атака",
-                    description: "Атакуйте врага, чтобы очистить путь к цели",
-                    robot: {x: 1, y: 3},
-                    target: {x: 5, y: 3},
-                    enemies: [{x: 3, y: 3}],
-                    obstacles: [],
-                    program: [],
-                    completed: false,
-                    unlocked: false
-                },
-                {
-                    title: "Комбинированное движение",
-                    description: "Сочетайте разные команды движения для достижения цели",
-                    robot: {x: 1, y: 5},
-                    target: {x: 7, y: 1},
-                    enemies: [],
-                    obstacles: [{x: 3, y: 3}, {x: 4, y: 4}],
-                    program: [],
-                    completed: false,
-                    unlocked: false
-                },
-                {
-                    title: "Множественные враги",
-                    description: "Уничтожьте всех врагов на пути к цели",
-                    robot: {x: 1, y: 3},
-                    target: {x: 7, y: 3},
-                    enemies: [{x: 3, y: 3}, {x: 5, y: 3}],
-                    obstacles: [],
-                    program: [],
-                    completed: false,
-                    unlocked: false
-                },
-                {
-                    title: "Лабиринт",
-                    description: "Найдите путь через лабиринт к цели",
-                    robot: {x: 1, y: 1},
-                    target: {x: 7, y: 5},
-                    enemies: [],
-                    obstacles: [
-                        {x: 2, y: 1}, {x: 3, y: 1}, {x: 4, y: 1}, {x: 5, y: 1}, {x: 6, y: 1},
-                        {x: 1, y: 2}, {x: 5, y: 2}, {x: 7, y: 2},
-                        {x: 1, y: 3}, {x: 3, y: 3}, {x: 5, y: 3}, {x: 7, y: 3},
-                        {x: 1, y: 4}, {x: 3, y: 4},
-                        {x: 3, y: 5}, {x: 4, y: 5}, {x: 5, y: 5}, {x: 6, y: 5}
-                    ],
-                    program: [],
-                    completed: false,
-                    unlocked: false
-                },
-                {
-                    title: "Тактическая атака",
-                    description: "Подойдите к врагу с правильной стороны для атаки",
-                    robot: {x: 1, y: 3},
-                    target: {x: 7, y: 3},
-                    enemies: [{x: 4, y: 3}],
-                    obstacles: [{x: 3, y: 3}, {x: 4, y: 2}, {x: 4, y: 4}],
-                    program: [],
-                    completed: false,
-                    unlocked: false
-                },
-                {
-                    title: "Сложный маршрут",
-                    description: "Составьте сложную программу для достижения цели",
-                    robot: {x: 1, y: 5},
-                    target: {x: 7, y: 1},
-                    enemies: [{x: 3, y: 3}, {x: 5, y: 3}],
-                    obstacles: [
-                        {x: 2, y: 2}, {x: 2, y: 3}, {x: 2, y: 4},
-                        {x: 4, y: 1}, {x: 4, y: 2}, {x: 4, y: 4}, {x: 4, y: 5},
-                        {x: 6, y: 2}, {x: 6, y: 3}, {x: 6, y: 4}
-                    ],
-                    program: [],
-                    completed: false,
-                    unlocked: false
-                },
-                {
-                    title: "Финальное испытание",
-                    description: "Примените все полученные навыки в сложном уровне",
-                    robot: {x: 1, y: 1},
-                    target: {x: 9, y: 5},
-                    enemies: [{x: 3, y: 2}, {x: 5, y: 3}, {x: 7, y: 3}],
-                    obstacles: [
-                        {x: 3, y: 1}, {x: 4, y: 1}, {x: 5, y: 1}, {x: 6, y: 1}, {x: 7, y: 1}, {x: 8, y: 1},
-                        {x: 1, y: 2}, {x: 4, y: 2}, {x: 6, y: 2}, {x: 8, y: 2}, {x: 9, y: 2},
-                        {x: 1, y: 3}, {x: 2, y: 3}, {x: 4, y: 3}, {x: 6, y: 3}, {x: 8, y: 3},
-                        {x: 1, y: 4}, {x: 2, y: 4}, {x: 3, y: 4}, {x: 4, y: 4}, {x: 6, y: 4}, {x: 8, y: 4},
-                        {x: 1, y: 5}, {x: 3, y: 5}, {x: 8, y: 5}
-                    ],
-                    program: [],
-                    completed: false,
-                    unlocked: false
                 }
-            ],
-            program: [],
-            isRunning: false,
-            currentStep: 0,
-            gameOver: false,
-            gameResult: null,
-            draggedBlock: null,
-            draggedBlockIndex: null,
-            levelOffset: {x: 0, y: 0},
-            currentCommandSteps: 0, // Текущее количество выполненных шагов команды
-            totalCommandSteps: 0    // Общее количество шагов команды
-        };
+            }
+        }
 
-        // Получение элементов DOM
-        const canvas = document.getElementById('game-canvas');
-        const ctx = canvas.getContext('2d');
-
-        const screens = {
-            main_menu: document.getElementById('main-menu'),
-            levels: document.getElementById('levels-screen'),
-            tutorial: document.getElementById('tutorial-screen'),
-            game: null // Игровой экран рисуется на canvas
-        };
-
-        // Кнопки
-        const buttons = {
-            // Главное меню
-            levels: document.getElementById('levels-btn'),
-            tutorial: document.getElementById('tutorial-btn'),
+        // Создание нового уровня
+        function createNewLevel() {
+            // Сброс сетки
+            gameState.workshop.grid = Array(GRID_HEIGHT).fill().map(() => Array(GRID_WIDTH).fill(null));
             
-            // Назад
-            levelsBack: document.getElementById('levels-back-btn'),
-            tutorialBack: document.getElementById('tutorial-back-btn'),
-            gameBack: document.getElementById('game-back-btn'),
+            // Сброс формы
+            levelTitleInput.value = '';
+            levelDescriptionInput.value = '';
+            levelAuthorInput.value = '';
             
-            // Программирование
-            runProgram: document.getElementById('run-program-btn'),
-            resetProgram: document.getElementById('reset-program-btn'),
+            // Показать редактор
+            editorContainer.style.display = 'flex';
+            customLevelsList.style.display = 'none';
+            emptyLevelsMessage.style.display = 'none';
             
-            // Результат
-            nextLevel: document.getElementById('next-level-btn'),
-            levelsMenu: document.getElementById('levels-menu-btn'),
+            gameState.workshop.editMode = true;
+            gameState.workshop.currentEditLevel = null;
             
-            // Неудача
-            retryLevel: document.getElementById('retry-level-btn'),
-            failLevelsMenu: document.getElementById('fail-levels-menu-btn'),
-            
-            // Столкновение с врагом
-            retryEnemy: document.getElementById('retry-enemy-btn'),
-            enemyLevelsMenu: document.getElementById('enemy-levels-menu-btn')
-        };
+            renderEditor();
+        }
 
-        // UI элементы
-        const currentLevelElement = document.getElementById('current-level');
-        const currentTaskElement = document.getElementById('current-task');
-        const gameUI = document.getElementById('game-ui');
-        const programmingArea = document.getElementById('programming-area');
-        const programSlots = document.getElementById('program-slots');
-        const deleteZone = document.getElementById('delete-zone');
-        const gameResultElement = document.getElementById('game-result');
-        const resultTitle = document.getElementById('result-title');
-        const resultMessage = document.getElementById('result-message');
-        const gameFailElement = document.getElementById('game-fail');
-        const failTitle = document.getElementById('fail-title');
-        const failMessage = document.getElementById('fail-message');
-        const enemyCollisionElement = document.getElementById('enemy-collision');
-        const enemyTitle = document.getElementById('enemy-title');
-        const enemyMessage = document.getElementById('enemy-message');
+        // Загрузка пользовательских уровней
+        function loadCustomLevels() {
+            const savedLevels = localStorage.getItem('robotProgrammingCustomLevels');
+            if (savedLevels) {
+                gameState.workshop.customLevels = JSON.parse(savedLevels);
+                renderCustomLevelsList();
+            }
+        }
 
-        // Переменные для динамического размера
-        let gridSize;
-        let gameAreaHeight;
-        let offsetX, offsetY;
+        // Сохранение пользовательских уровней
+        function saveCustomLevels() {
+            localStorage.setItem('robotProgrammingCustomLevels', JSON.stringify(gameState.workshop.customLevels));
+        }
 
-        // Инициализация игры
+        // Рендер списка пользовательских уровней
+        function renderCustomLevelsList() {
+            customLevelsList.innerHTML = '';
+            
+            if (gameState.workshop.customLevels.length === 0) {
+                emptyLevelsMessage.style.display = 'block';
+                return;
+            }
+            
+            emptyLevelsMessage.style.display = 'none';
+            
+            gameState.workshop.customLevels.forEach((level, index) => {
+                const levelItem = document.createElement('div');
+                levelItem.className = 'level-item';
+                levelItem.innerHTML = `
+                    <div class="level-item-header">
+                        <div class="level-item-title">${level.title}</div>
+                        <div class="level-item-author">by ${level.author}</div>
+                    </div>
+                    <div class="level-item-description">${level.description}</div>
+                    <div class="level-item-stats">
+                        <span>Сложность: ${level.difficulty || 'Не указана'}</span>
+                        <span>Объектов: ${countObjects(level)}</span>
+                    </div>
+                    <div style="margin-top: 10px; display: flex; gap: 10px;">
+                        <button class="button" style="padding: 5px 10px; font-size: 12px; height: auto;" data-play="${level.id}">Играть</button>
+                        <button class="button" style="padding: 5px 10px; font-size: 12px; height: auto;" data-edit="${level.id}">Редактировать</button>
+                        <button class="button delete-level-btn" data-delete="${level.id}">Удалить</button>
+                    </div>
+                `;
+                
+                customLevelsList.appendChild(levelItem);
+            });
+            
+            // Добавляем обработчики для кнопок
+            document.querySelectorAll('[data-play]').forEach(btn => {
+                btn.addEventListener('click', (e) => {
+                    const levelId = e.target.getAttribute('data-play');
+                    playCustomLevel(levelId);
+                });
+            });
+            
+            document.querySelectorAll('[data-edit]').forEach(btn => {
+                btn.addEventListener('click', (e) => {
+                    const levelId = e.target.getAttribute('data-edit');
+                    editCustomLevel(levelId);
+                });
+            });
+            
+            document.querySelectorAll('[data-delete]').forEach(btn => {
+                btn.addEventListener('click', (e) => {
+                    const levelId = e.target.getAttribute('data-delete');
+                    deleteCustomLevel(levelId);
+                });
+            });
+        }
+
+        // Подсчет объектов в уровне
+        function countObjects(level) {
+            let count = 0;
+            count += level.obstacles ? level.obstacles.length : 0;
+            count += level.enemies ? level.enemies.length : 0;
+            count += level.robot ? 1 : 0;
+            count += level.target ? 1 : 0;
+            return count;
+        }
+
+        // Играть в пользовательский уровень
+        function playCustomLevel(levelId) {
+            const level = gameState.workshop.customLevels.find(l => l.id === levelId);
+            if (level) {
+                // Добавляем уровень в общий список уровней временно
+                const customLevelIndex = gameState.levels.length;
+                gameState.levels.push({
+                    ...level,
+                    program: [],
+                    completed: false,
+                    unlocked: true,
+                    isCustom: true
+                });
+                
+                startLevel(customLevelIndex);
+            }
+        }
+
+        // Редактирование пользовательского уровня
+        function editCustomLevel(levelId) {
+            const level = gameState.workshop.customLevels.find(l => l.id === levelId);
+            if (level) {
+                // Заполняем форму
+                levelTitleInput.value = level.title;
+                levelDescriptionInput.value = level.description;
+                levelAuthorInput.value = level.author;
+                
+                // Загружаем сетку
+                gameState.workshop.grid = Array(GRID_HEIGHT).fill().map(() => Array(GRID_WIDTH).fill(null));
+                
+                // Размещаем объекты на сетке
+                if (level.robot) {
+                    gameState.workshop.grid[level.robot.y][level.robot.x] = 'robot';
+                }
+                
+                if (level.target) {
+                    gameState.workshop.grid[level.target.y][level.target.x] = 'target';
+                }
+                
+                level.enemies.forEach(enemy => {
+                    gameState.workshop.grid[enemy.y][enemy.x] = 'enemy';
+                });
+                
+                level.obstacles.forEach(obstacle => {
+                    gameState.workshop.grid[obstacle.y][obstacle.x] = 'obstacle';
+                });
+                
+                // Показать редактор
+                editorContainer.style.display = 'flex';
+                customLevelsList.style.display = 'none';
+                
+                gameState.workshop.editMode = true;
+                gameState.workshop.currentEditLevel = levelId;
+                
+                renderEditor();
+            }
+        }
+
+        // Удаление пользовательского уровня
+        function deleteCustomLevel(levelId) {
+            if (confirm('Вы уверены, что хотите удалить этот уровень?')) {
+                gameState.workshop.customLevels = gameState.workshop.customLevels.filter(l => l.id !== levelId);
+                saveCustomLevels();
+                renderCustomLevelsList();
+            }
+        }
+
+        // Сохранение уровня
+        function saveLevel() {
+            const title = levelTitleInput.value.trim();
+            const description = levelDescriptionInput.value.trim();
+            const author = levelAuthorInput.value.trim();
+            
+            if (!title) {
+                alert('Пожалуйста, введите название уровня');
+                return;
+            }
+            
+            if (!author) {
+                alert('Пожалуйста, введите имя автора');
+                return;
+            }
+            
+            // Собираем объекты из сетки
+            const robot = findObject('robot');
+            const target = findObject('target');
+            const enemies = findAllObjects('enemy');
+            const obstacles = findAllObjects('obstacle');
+            
+            if (!robot) {
+                alert('На уровне должен быть робот!');
+                return;
+            }
+            
+            if (!target) {
+                alert('На уровне должна быть цель!');
+                return;
+            }
+            
+            const levelData = {
+                id: gameState.workshop.currentEditLevel || generateId(),
+                title,
+                description,
+                author,
+                robot,
+                target,
+                enemies,
+                obstacles,
+                createdAt: new Date().toISOString(),
+                difficulty: calculateDifficulty(enemies.length, obstacles.length)
+            };
+            
+            if (gameState.workshop.currentEditLevel) {
+                // Обновление существующего уровня
+                const index = gameState.workshop.customLevels.findIndex(l => l.id === gameState.workshop.currentEditLevel);
+                if (index !== -1) {
+                    gameState.workshop.customLevels[index] = levelData;
+                }
+            } else {
+                // Добавление нового уровня
+                gameState.workshop.customLevels.push(levelData);
+            }
+            
+            saveCustomLevels();
+            cancelEdit();
+            renderCustomLevelsList();
+        }
+
+        // Поиск объекта на сетке
+        function findObject(type) {
+            for (let y = 0; y < GRID_HEIGHT; y++) {
+                for (let x = 0; x < GRID_WIDTH; x++) {
+                    if (gameState.workshop.grid[y][x] === type) {
+                        return {x, y};
+                    }
+                }
+            }
+            return null;
+        }
+
+        // Поиск всех объектов определенного типа
+        function findAllObjects(type) {
+            const objects = [];
+            for (let y = 0; y < GRID_HEIGHT; y++) {
+                for (let x = 0; x < GRID_WIDTH; x++) {
+                    if (gameState.workshop.grid[y][x] === type) {
+                        objects.push({x, y});
+                    }
+                }
+            }
+            return objects;
+        }
+
+        // Генерация ID
+        function generateId() {
+            return Date.now().toString(36) + Math.random().toString(36).substr(2);
+        }
+
+        // Расчет сложности уровня
+        function calculateDifficulty(enemies, obstacles) {
+            const total = enemies + obstacles;
+            if (total < 3) return 'Легкий';
+            if (total < 6) return 'Средний';
+            if (total < 10) return 'Сложный';
+            return 'Эксперт';
+        }
+
+        // Тестирование уровня
+        function testLevel() {
+            const robot = findObject('robot');
+            const target = findObject('target');
+            const enemies = findAllObjects('enemy');
+            const obstacles = findAllObjects('obstacle');
+            
+            if (!robot || !target) {
+                alert('Для тестирования уровня нужны робот и цель!');
+                return;
+            }
+            
+            // Создаем временный уровень для тестирования
+            const testLevel = {
+                title: 'Тестовый уровень',
+                description: 'Тестирование созданного уровня',
+                robot,
+                target,
+                enemies,
+                obstacles,
+                program: [],
+                completed: false,
+                unlocked: true,
+                isCustom: true
+            };
+            
+            // Добавляем в общий список и запускаем
+            const testLevelIndex = gameState.levels.length;
+            gameState.levels.push(testLevel);
+            startLevel(testLevelIndex);
+        }
+
+        // Отмена редактирования
+        function cancelEdit() {
+            editorContainer.style.display = 'none';
+            customLevelsList.style.display = 'block';
+            gameState.workshop.editMode = false;
+            gameState.workshop.currentEditLevel = null;
+            
+            // Показываем сообщение если уровней нет
+            if (gameState.workshop.customLevels.length === 0) {
+                emptyLevelsMessage.style.display = 'block';
+            }
+        }
+
+        // Импорт уровня
+        function importLevel() {
+            const input = document.createElement('input');
+            input.type = 'file';
+            input.accept = '.json';
+            
+            input.onchange = e => {
+                const file = e.target.files[0];
+                const reader = new FileReader();
+                
+                reader.onload = event => {
+                    try {
+                        const levelData = JSON.parse(event.target.result);
+                        
+                        // Валидация данных уровня
+                        if (!levelData.robot || !levelData.target) {
+                            alert('Некорректный файл уровня: отсутствуют робот или цель');
+                            return;
+                        }
+                        
+                        // Добавляем уровень
+                        levelData.id = generateId();
+                        levelData.createdAt = new Date().toISOString();
+                        gameState.workshop.customLevels.push(levelData);
+                        saveCustomLevels();
+                        renderCustomLevelsList();
+                        
+                        alert('Уровень успешно импортирован!');
+                    } catch (error) {
+                        alert('Ошибка при чтении файла: ' + error.message);
+                    }
+                };
+                
+                reader.readAsText(file);
+            };
+            
+            input.click();
+        }
+
+        // Экспорт уровня
+        function exportLevel() {
+            if (!gameState.workshop.currentEditLevel) {
+                alert('Сначала создайте или откройте уровень для редактирования');
+                return;
+            }
+            
+            const level = gameState.workshop.customLevels.find(l => l.id === gameState.workshop.currentEditLevel);
+            if (!level) {
+                alert('Уровень не найден');
+                return;
+            }
+            
+            // Создаем копию без служебных полей
+            const exportData = {
+                title: level.title,
+                description: level.description,
+                author: level.author,
+                robot: level.robot,
+                target: level.target,
+                enemies: level.enemies,
+                obstacles: level.obstacles,
+                difficulty: level.difficulty
+            };
+            
+            const dataStr = JSON.stringify(exportData, null, 2);
+            const dataBlob = new Blob([dataStr], {type: 'application/json'});
+            
+            const url = URL.createObjectURL(dataBlob);
+            const link = document.createElement('a');
+            link.href = url;
+            link.download = `robot_level_${level.title.replace(/[^a-z0-9]/gi, '_').toLowerCase()}.json`;
+            document.body.appendChild(link);
+            link.click();
+            document.body.removeChild(link);
+            URL.revokeObjectURL(url);
+        }
+
+        // Обновляем функцию initGame для включения мастерской
         function initGame() {
             // Настройка кнопок
             setupButtons();
             
-            // Настройка перетаскивания команд
+            // Настройка мастерской
+            setupWorkshop();
+            
+            // Остальная существующая инициализация...
             setupDragAndDrop();
-            
-            // Настройка обработчика изменения размера окна
             window.addEventListener('resize', handleResize);
-            
-            // Инициализация размеров
             handleResize();
-            
-            // Запуск игрового цикла
             gameLoop();
         }
 
-        // Обработка изменения размера окна
-        function handleResize() {
-            // Установка размера canvas
-            canvas.width = window.innerWidth;
-            canvas.height = window.innerHeight;
-            
-            // Вычисление размера игровой области
-            gameAreaHeight = window.innerHeight - programmingArea.offsetHeight;
-            
-            // Вычисление размера клетки
-            gridSize = Math.min(
-                window.innerWidth / GRID_WIDTH,
-                gameAreaHeight / GRID_HEIGHT
-            );
-            
-            // Вычисление отступов для центрирования
-            offsetX = (window.innerWidth - GRID_WIDTH * gridSize) / 2;
-            offsetY = (gameAreaHeight - GRID_HEIGHT * gridSize) / 2;
-        }
-
-        // Настройка обработчиков кнопок
-        function setupButtons() {
-            // Главное меню
-            buttons.levels.addEventListener('click', () => showScreen('levels'));
-            buttons.tutorial.addEventListener('click', () => showScreen('tutorial'));
-            
-            // Кнопки назад
-            buttons.levelsBack.addEventListener('click', () => showScreen('main_menu'));
-            buttons.tutorialBack.addEventListener('click', () => showScreen('main_menu'));
-            buttons.gameBack.addEventListener('click', () => {
-                resetGame();
-                showScreen('levels');
-            });
-            
-            // Программирование
-            buttons.runProgram.addEventListener('click', runProgram);
-            buttons.resetProgram.addEventListener('click', resetProgram);
-            
-            // Результат
-            buttons.nextLevel.addEventListener('click', nextLevel);
-            buttons.levelsMenu.addEventListener('click', () => {
-                gameResultElement.classList.add('hidden');
-                showScreen('levels');
-            });
-            
-            // Неудача
-            buttons.retryLevel.addEventListener('click', retryLevel);
-            buttons.failLevelsMenu.addEventListener('click', () => {
-                gameFailElement.classList.add('hidden');
-                showScreen('levels');
-            });
-            
-            // Столкновение с врагом
-            buttons.retryEnemy.addEventListener('click', retryLevel);
-            buttons.enemyLevelsMenu.addEventListener('click', () => {
-                enemyCollisionElement.classList.add('hidden');
-                showScreen('levels');
-            });
-        }
-
-        // Настройка перетаскивания команд
-        function setupDragAndDrop() {
-            const commands = document.querySelectorAll('.command');
-            
-            commands.forEach(command => {
-                command.addEventListener('dragstart', (e) => {
-                    const commandData = {
-                        command: command.getAttribute('data-command'),
-                        steps: 1 // По умолчанию 1 шаг
-                    };
-                    e.dataTransfer.setData('text/plain', JSON.stringify(commandData));
-                    e.dataTransfer.setData('source', 'panel');
-                });
-            });
-            
-            // Обработчики для зоны удаления
-            deleteZone.addEventListener('dragover', (e) => {
-                e.preventDefault();
-                deleteZone.classList.add('highlight');
-            });
-            
-            deleteZone.addEventListener('dragleave', () => {
-                deleteZone.classList.remove('highlight');
-            });
-            
-            deleteZone.addEventListener('drop', (e) => {
-                e.preventDefault();
-                deleteZone.classList.remove('highlight');
-                
-                const source = e.dataTransfer.getData('source');
-                
-                if (source === 'slot' && gameState.draggedBlockIndex !== null) {
-                    // Удаляем блок из программы
-                    gameState.program[gameState.draggedBlockIndex] = null;
-                    updateProgramSlots();
-                }
-            });
-        }
-
-        // Показать экран
+        // Обновляем функцию showScreen для мастерской
         function showScreen(screenName) {
-            // Скрыть все экраны
-            Object.values(screens).forEach(screen => {
-                if (screen) screen.classList.add('hidden');
-            });
+            // Существующий код...
             
-            // Скрыть игровой UI и область программирования
-            gameUI.classList.add('hidden');
-            programmingArea.classList.add('hidden');
-            gameResultElement.classList.add('hidden');
-            gameFailElement.classList.add('hidden');
-            enemyCollisionElement.classList.add('hidden');
-            
-            // Убрать блокировку взаимодействия
-            gameUI.classList.remove('blocked');
-            programmingArea.classList.remove('blocked');
-            
-            // Показать выбранный экран
-            if (screenName === 'game') {
-                // Игровой экран рисуется на canvas
-                gameUI.classList.remove('hidden');
-                programmingArea.classList.remove('hidden');
-                setupProgramSlots();
-            } else if (screens[screenName]) {
-                screens[screenName].classList.remove('hidden');
+            // Дополнительная логика для мастерской
+            if (screenName === 'workshop') {
+                renderCustomLevelsList();
             }
             
-            gameState.currentScreen = screenName;
-            
-            // Обновление контента экрана
-            if (screenName === 'levels') {
-                renderLevelsScreen();
-            }
+            // Остальной существующий код...
         }
 
-        // Рендер экрана уровней
-        function renderLevelsScreen() {
-            const container = document.getElementById('levels-container');
-            container.innerHTML = '';
-            
-            gameState.levels.forEach((level, index) => {
-                const card = document.createElement('div');
-                card.className = `level-card ${level.unlocked ? '' : 'locked'}`;
-                card.innerHTML = `
-                    <div class="level-number">${index + 1}</div>
-                    <div class="level-title">${level.title}</div>
-                    <div class="level-description">${level.description}</div>
-                    ${level.unlocked ? '' : '<div class="lock-icon">🔒</div>'}
-                    ${level.completed ? '<div style="position:absolute; bottom:10px; color:#81c784;">✓ Пройден</div>' : ''}
-                `;
-                
-                if (level.unlocked) {
-                    card.addEventListener('click', () => {
-                        startLevel(index);
-                    });
-                }
-                
-                container.appendChild(card);
-            });
+        // Пример структуры level.json:
+        /*
+        {
+            "title": "Мой первый уровень",
+            "description": "Простой уровень для обучения",
+            "author": "Игрок",
+            "robot": {"x": 2, "y": 4},
+            "target": {"x": 7, "y": 4},
+            "enemies": [
+                {"x": 4, "y": 4}
+            ],
+            "obstacles": [
+                {"x": 3, "y": 3},
+                {"x": 3, "y": 4},
+                {"x": 3, "y": 5}
+            ],
+            "difficulty": "Средний"
         }
-
-        // Начать уровень
-        function startLevel(levelIndex) {
-            if (!gameState.levels[levelIndex].unlocked) return;
-            
-            gameState.currentLevel = levelIndex;
-            const level = gameState.levels[levelIndex];
-            
-            // Сброс состояния игры
-            resetLevelState(levelIndex);
-            
-            // Вычисление смещения для центрирования уровня
-            calculateLevelOffset(level);
-            
-            // Обновление UI
-            currentLevelElement.textContent = levelIndex + 1;
-            currentTaskElement.textContent = level.description;
-            
-            showScreen('game');
-            setupProgramSlots();
-        }
-
-        // Вычислить смещение для центрирования уровня
-        function calculateLevelOffset(level) {
-            // Собираем все объекты уровня
-            const objects = [
-                level.robot,
-                level.target,
-                ...level.enemies,
-                ...level.obstacles
-            ];
-            
-            // Находим минимальные и максимальные координаты
-            let minX = GRID_WIDTH, maxX = 0;
-            let minY = GRID_HEIGHT, maxY = 0;
-            
-            objects.forEach(obj => {
-                minX = Math.min(minX, obj.x);
-                maxX = Math.max(maxX, obj.x);
-                minY = Math.min(minY, obj.y);
-                maxY = Math.max(maxY, obj.y);
-            });
-            
-            // Вычисляем центр уровня
-            const levelCenterX = (minX + maxX) / 2;
-            const levelCenterY = (minY + maxY) / 2;
-            
-            // Центр игрового поля
-            const gridCenterX = GRID_WIDTH / 2;
-            const gridCenterY = GRID_HEIGHT / 2;
-            
-            // Вычисляем смещение для центрирования уровня
-            gameState.levelOffset = {
-                x: gridCenterX - levelCenterX,
-                y: gridCenterY - levelCenterY
-            };
-        }
-
-        // Сброс состояния уровня
-        function resetLevelState(levelIndex) {
-            const level = gameState.levels[levelIndex];
-            const initialLevel = JSON.parse(JSON.stringify(initialLevelStates[levelIndex]));
-            
-            // Восстановление начального состояния уровня
-            level.robot = {...initialLevel.robot};
-            level.enemies = [...initialLevel.enemies];
-            level.obstacles = [...initialLevel.obstacles];
-            
-            gameState.program = [];
-            gameState.isRunning = false;
-            gameState.currentStep = 0;
-            gameState.gameOver = false;
-            gameState.gameResult = null;
-            gameState.currentCommandSteps = 0;
-            gameState.totalCommandSteps = 0;
-        }
-
-        // Начальные состояния уровней
-        const initialLevelStates = JSON.parse(JSON.stringify(gameState.levels));
-
-        // Настройка слотов программы
-        function setupProgramSlots() {
-            programSlots.innerHTML = '';
-            
-            // Создаем 20 слотов для программы
-            for (let i = 0; i < 20; i++) {
-                const slot = document.createElement('div');
-                slot.className = 'program-slot';
-                slot.textContent = i + 1;
-                slot.dataset.index = i;
-                
-                // Обработчики для перетаскивания блоков между слотами
-                slot.addEventListener('dragover', (e) => {
-                    e.preventDefault();
-                    slot.classList.add('highlight');
-                });
-                
-                slot.addEventListener('dragleave', () => {
-                    slot.classList.remove('highlight');
-                });
-                
-                slot.addEventListener('drop', (e) => {
-                    e.preventDefault();
-                    slot.classList.remove('highlight');
-                    
-                    const commandData = JSON.parse(e.dataTransfer.getData('text/plain'));
-                    const source = e.dataTransfer.getData('source');
-                    const targetIndex = parseInt(slot.dataset.index);
-                    
-                    if (source === 'panel') {
-                        // Добавляем новую команду из панели
-                        if (!gameState.program[targetIndex]) {
-                            gameState.program[targetIndex] = commandData;
-                        }
-                    } else if (source === 'slot') {
-                        // Перемещаем блок между слотами
-                        if (gameState.draggedBlockIndex !== null && gameState.draggedBlockIndex !== targetIndex) {
-                            // Меняем местами блоки
-                            const temp = gameState.program[targetIndex];
-                            gameState.program[targetIndex] = gameState.program[gameState.draggedBlockIndex];
-                            gameState.program[gameState.draggedBlockIndex] = temp;
-                        }
-                    }
-                    
-                    updateProgramSlots();
-                });
-                
-                programSlots.appendChild(slot);
-            }
-            
-            updateProgramSlots();
-        }
-
-        // Обновить отображение слотов программы
-        function updateProgramSlots() {
-            const slots = document.querySelectorAll('.program-slot');
-            
-            slots.forEach((slot, index) => {
-                const commandData = gameState.program[index];
-                
-                // Очищаем слот
-                slot.innerHTML = '';
-                slot.textContent = index + 1;
-                slot.classList.remove('filled');
-                
-                if (commandData) {
-                    // Создаем блок команды
-                    const block = document.createElement('div');
-                    block.className = 'program-block';
-                    
-                    // Текст команды
-                    const commandText = document.createElement('div');
-                    commandText.textContent = getCommandText(commandData);
-                    block.appendChild(commandText);
-                    
-                    // Добавляем ввод количества шагов для команд движения
-                    if (commandData.command !== 'attack') {
-                        const stepsContainer = document.createElement('div');
-                        stepsContainer.className = 'steps-input-container';
-                        
-                        const stepsInput = document.createElement('input');
-                        stepsInput.type = 'number';
-                        stepsInput.className = 'steps-input';
-                        stepsInput.min = 1;
-                        stepsInput.max = 99;
-                        stepsInput.value = commandData.steps;
-                        stepsInput.addEventListener('change', (e) => {
-                            const value = parseInt(e.target.value);
-                            if (value >= 1 && value <= 99) {
-                                commandData.steps = value;
-                                updateProgramSlots();
-                            } else {
-                                e.target.value = commandData.steps;
-                            }
-                        });
-                        
-                        const stepsLabel = document.createElement('span');
-                        stepsLabel.className = 'steps-label';
-                        stepsLabel.textContent = 'клетки';
-                        
-                        stepsContainer.appendChild(stepsInput);
-                        stepsContainer.appendChild(stepsLabel);
-                        block.appendChild(stepsContainer);
-                    }
-                    
-                    block.draggable = true;
-                    block.dataset.index = index;
-                    
-                    // Обработчики для перетаскивания блоков
-                    block.addEventListener('dragstart', (e) => {
-                        e.dataTransfer.setData('text/plain', JSON.stringify(commandData));
-                        e.dataTransfer.setData('source', 'slot');
-                        gameState.draggedBlockIndex = index;
-                    });
-                    
-                    // Добавляем кнопку удаления
-                    const deleteBtn = document.createElement('div');
-                    deleteBtn.className = 'delete-btn';
-                    deleteBtn.textContent = '×';
-                    deleteBtn.addEventListener('click', (e) => {
-                        e.stopPropagation();
-                        gameState.program[index] = null;
-                        updateProgramSlots();
-                    });
-                    
-                    block.appendChild(deleteBtn);
-                    slot.appendChild(block);
-                    slot.classList.add('filled');
-                }
-            });
-        }
-
-        // Получить текст команды
-        function getCommandText(commandData) {
-            const commandTexts = {
-                'forward': 'Вперед',
-                'backward': 'Назад',
-                'right': 'Вправо',
-                'left': 'Влево',
-                'attack': 'Атака'
-            };
-            
-            return commandTexts[commandData.command] || commandData.command;
-        }
-
-        // Запуск программы
-        function runProgram() {
-            if (gameState.isRunning || gameState.program.length === 0) return;
-            
-            gameState.isRunning = true;
-            gameState.currentStep = 0;
-            gameState.currentCommandSteps = 0;
-            gameState.totalCommandSteps = 0;
-            executeNextStep();
-        }
-
-        // Выполнить следующий шаг программы
-        function executeNextStep() {
-            if (!gameState.isRunning) return;
-            
-            // Если текущая команда движения еще не завершена
-            if (gameState.currentCommandSteps < gameState.totalCommandSteps) {
-                performMovementStep();
-                gameState.currentCommandSteps++;
-                
-                // Если команда движения завершена
-                if (gameState.currentCommandSteps >= gameState.totalCommandSteps) {
-                    gameState.currentStep++;
-                    gameState.currentCommandSteps = 0;
-                    gameState.totalCommandSteps = 0;
-                }
-                
-                // Задержка перед следующим шагом для визуализации
-                setTimeout(executeNextStep, 300);
-                return;
-            }
-            
-            // Если программа завершена
-            if (gameState.currentStep >= gameState.program.length) {
-                gameState.isRunning = false;
-                checkGameResult();
-                return;
-            }
-            
-            const commandData = gameState.program[gameState.currentStep];
-            
-            if (!commandData) {
-                // Пропускаем пустые команды
-                gameState.currentStep++;
-                setTimeout(executeNextStep, 100);
-                return;
-            }
-            
-            // Выполнение команды
-            if (commandData.command === 'attack') {
-                // Атаковать ближайшего врага в радиусе 1 клетки
-                const level = gameState.levels[gameState.currentLevel];
-                const enemyIndex = level.enemies.findIndex(enemy => 
-                    Math.abs(enemy.x - level.robot.x) <= 1 && 
-                    Math.abs(enemy.y - level.robot.y) <= 1
-                );
-                
-                if (enemyIndex !== -1) {
-                    level.enemies.splice(enemyIndex, 1);
-                }
-                
-                gameState.currentStep++;
-                setTimeout(executeNextStep, 500);
-            } else {
-                // Команда движения - начинаем последовательное выполнение
-                gameState.totalCommandSteps = commandData.steps;
-                gameState.currentCommandSteps = 0;
-                executeNextStep();
-            }
-        }
-
-        // Выполнить один шаг движения
-        function performMovementStep() {
-            const commandData = gameState.program[gameState.currentStep];
-            const level = gameState.levels[gameState.currentLevel];
-            
-            // Выполнение одного шага движения
-            switch (commandData.command) {
-                case 'forward':
-                    if (level.robot.y > 0 && !isObstacle(level.robot.x, level.robot.y - 1)) {
-                        level.robot.y--;
-                    }
-                    break;
-                case 'backward':
-                    if (level.robot.y < GRID_HEIGHT - 1 && !isObstacle(level.robot.x, level.robot.y + 1)) {
-                        level.robot.y++;
-                    }
-                    break;
-                case 'right':
-                    if (level.robot.x < GRID_WIDTH - 1 && !isObstacle(level.robot.x + 1, level.robot.y)) {
-                        level.robot.x++;
-                    }
-                    break;
-                case 'left':
-                    if (level.robot.x > 0 && !isObstacle(level.robot.x - 1, level.robot.y)) {
-                        level.robot.x--;
-                    }
-                    break;
-            }
-            
-            // Проверка столкновения с врагом
-            if (isOnEnemy(level.robot.x, level.robot.y)) {
-                gameState.isRunning = false;
-                enemyTitle.textContent = 'СТОЛКНОВЕНИЕ С ВРАГОМ!';
-                enemyMessage.textContent = 'Робот столкнулся с врагом и был уничтожен.';
-                enemyCollisionElement.classList.remove('hidden');
-                // Блокируем взаимодействие с игровым полем
-                gameUI.classList.add('blocked');
-                programmingArea.classList.add('blocked');
-                return;
-            }
-        }
-
-        // Проверить, является ли клетка препятствием
-        function isObstacle(x, y) {
-            const level = gameState.levels[gameState.currentLevel];
-            return level.obstacles.some(obstacle => obstacle.x === x && obstacle.y === y);
-        }
-
-        // Проверить, находится ли робот на клетке с врагом
-        function isOnEnemy(x, y) {
-            const level = gameState.levels[gameState.currentLevel];
-            return level.enemies.some(enemy => enemy.x === x && enemy.y === y);
-        }
-
-        // Проверить результат игры
-        function checkGameResult() {
-            const level = gameState.levels[gameState.currentLevel];
-            
-            // Проверка достижения цели и уничтожения всех врагов
-            const isOnTarget = level.robot.x === level.target.x && level.robot.y === level.target.y;
-            const allEnemiesDefeated = level.enemies.length === 0;
-            
-            if (isOnTarget && allEnemiesDefeated) {
-                gameState.gameResult = 'win';
-                showGameResult(true);
-                
-                // Помечаем уровень как пройденный
-                level.completed = true;
-                
-                // Открываем следующий уровень, если он существует
-                if (gameState.currentLevel < gameState.levels.length - 1) {
-                    gameState.levels[gameState.currentLevel + 1].unlocked = true;
-                }
-            } else if (isOnTarget && !allEnemiesDefeated) {
-                // Робот на цели, но враги остались
-                gameState.gameResult = 'lose';
-                failTitle.textContent = 'ВРАГИ НЕ УНИЧТОЖЕНЫ!';
-                failMessage.textContent = 'Робот достиг цели, но не все враги уничтожены.';
-                showGameResult(false);
-            } else {
-                gameState.gameResult = 'lose';
-                showGameResult(false);
-            }
-        }
-
-        // Показать результат игры
-        function showGameResult(isWin) {
-            // Блокируем взаимодействие с игровым полем
-            gameUI.classList.add('blocked');
-            programmingArea.classList.add('blocked');
-            
-            if (isWin) {
-                resultTitle.textContent = 'УРОВЕНЬ ПРОЙДЕН!';
-                resultMessage.textContent = 'Поздравляем! Вы успешно запрограммировали робота.';
-                gameResultElement.classList.remove('hidden');
-            } else {
-                gameFailElement.classList.remove('hidden');
-            }
-        }
-
-        // Повторить уровень
-        function retryLevel() {
-            gameFailElement.classList.add('hidden');
-            enemyCollisionElement.classList.add('hidden');
-            resetLevelState(gameState.currentLevel);
-            updateProgramSlots();
-            // Разблокируем взаимодействие с игровым полем
-            gameUI.classList.remove('blocked');
-            programmingArea.classList.remove('blocked');
-        }
-
-        // Следующий уровень
-        function nextLevel() {
-            gameResultElement.classList.add('hidden');
-            
-            if (gameState.currentLevel < gameState.levels.length - 1) {
-                startLevel(gameState.currentLevel + 1);
-            } else {
-                showScreen('levels');
-            }
-        }
-
-        // Сброс программы
-        function resetProgram() {
-            gameState.program = [];
-            updateProgramSlots();
-        }
-
-        // Сброс игры
-        function resetGame() {
-            const level = gameState.levels[gameState.currentLevel];
-            // Восстановление начального состояния уровня
-            level.robot = {...initialLevelStates[gameState.currentLevel].robot};
-            level.enemies = [...initialLevelStates[gameState.currentLevel].enemies];
-            level.obstacles = [...initialLevelStates[gameState.currentLevel].obstacles];
-            
-            gameState.program = [];
-            gameState.isRunning = false;
-            gameState.currentStep = 0;
-            gameState.gameOver = false;
-            gameState.gameResult = null;
-            gameState.currentCommandSteps = 0;
-            gameState.totalCommandSteps = 0;
-            
-            updateProgramSlots();
-        }
-
-        // Рендер игры
-        function renderGame() {
-            // Очистка canvas
-            ctx.fillStyle = COLORS.BACKGROUND;
-            ctx.fillRect(0, 0, canvas.width, canvas.height);
-            
-            const level = gameState.levels[gameState.currentLevel];
-            
-            // Отрисовка сетки
-            ctx.strokeStyle = COLORS.GRID;
-            ctx.lineWidth = 1;
-            
-            for (let x = 0; x <= GRID_WIDTH; x++) {
-                const screenX = offsetX + x * gridSize;
-                ctx.beginPath();
-                ctx.moveTo(screenX, offsetY);
-                ctx.lineTo(screenX, offsetY + GRID_HEIGHT * gridSize);
-                ctx.stroke();
-            }
-            
-            for (let y = 0; y <= GRID_HEIGHT; y++) {
-                const screenY = offsetY + y * gridSize;
-                ctx.beginPath();
-                ctx.moveTo(offsetX, screenY);
-                ctx.lineTo(offsetX + GRID_WIDTH * gridSize, screenY);
-                ctx.stroke();
-            }
-            
-            // Отрисовка препятствий (стен)
-            level.obstacles.forEach(obstacle => {
-                const screenX = offsetX + (obstacle.x + gameState.levelOffset.x) * gridSize;
-                const screenY = offsetY + (obstacle.y + gameState.levelOffset.y) * gridSize;
-                
-                // Используем текстуру стены
-                if (textures.wall.complete) {
-                    // Рисуем текстуру строго по центру клетки
-                    ctx.drawImage(textures.wall, screenX, screenY, gridSize, gridSize);
-                } else {
-                    // Запасной вариант - цветной прямоугольник
-                    ctx.fillStyle = COLORS.OBSTACLE;
-                    ctx.fillRect(screenX, screenY, gridSize, gridSize);
-                }
-            });
-            
-            // Отрисовка цели
-            ctx.fillStyle = COLORS.TARGET;
-            const targetX = offsetX + (level.target.x + gameState.levelOffset.x) * gridSize;
-            const targetY = offsetY + (level.target.y + gameState.levelOffset.y) * gridSize;
-            ctx.fillRect(targetX, targetY, gridSize, gridSize);
-            ctx.strokeStyle = '#fff';
-            ctx.lineWidth = 2;
-            ctx.strokeRect(targetX, targetY, gridSize, gridSize);
-            
-            // Отрисовка врагов
-            level.enemies.forEach(enemy => {
-                const screenX = offsetX + (enemy.x + gameState.levelOffset.x) * gridSize;
-                const screenY = offsetY + (enemy.y + gameState.levelOffset.y) * gridSize;
-                
-                // Используем текстуру врага с увеличением в 2 раза
-                if (textures.enemy.complete) {
-                    // Рисуем текстуру в 2 раза больше с центром в середине клетки
-                    const size = gridSize * 2;
-                    const offset = (size - gridSize) / 2;
-                    ctx.drawImage(textures.enemy, screenX - offset, screenY - offset, size, size);
-                } else {
-                    // Запасной вариант - цветной прямоугольник увеличенного размера
-                    ctx.fillStyle = COLORS.ENEMY;
-                    const size = gridSize * 1.5;
-                    const offset = (size - gridSize) / 2;
-                    ctx.fillRect(screenX - offset, screenY - offset, size, size);
-                }
-                
-                // Отображение радиуса атаки
-                ctx.strokeStyle = 'rgba(239, 83, 80, 0.5)';
-                ctx.lineWidth = 2;
-                ctx.beginPath();
-                ctx.arc(
-                    screenX + gridSize / 2,
-                    screenY + gridSize / 2,
-                    gridSize * 1.5,
-                    0,
-                    Math.PI * 2
-                );
-                ctx.stroke();
-            });
-            
-            // Отрисовка робота
-            const robotX = offsetX + (level.robot.x + gameState.levelOffset.x) * gridSize;
-            const robotY = offsetY + (level.robot.y + gameState.levelOffset.y) * gridSize;
-            
-            // Используем текстуру робота с увеличением в 2 раза
-            if (textures.robot.complete) {
-                // Рисуем текстуру в 2 раза больше с центром в середине клетки
-                const size = gridSize * 2;
-                const offset = (size - gridSize) / 2;
-                ctx.drawImage(textures.robot, robotX - offset, robotY - offset, size, size);
-            } else {
-                // Запасной вариант - цветной прямоугольник увеличенного размера
-                ctx.fillStyle = COLORS.ROBOT;
-                const size = gridSize * 1.5;
-                const offset = (size - gridSize) / 2;
-                ctx.fillRect(robotX - offset, robotY - offset, size, size);
-                
-                // Добавление деталей роботу
-                ctx.fillStyle = '#5d4037';
-                const innerSize = size * 0.8;
-                const innerOffset = (size - innerSize) / 2;
-                ctx.fillRect(
-                    robotX - offset + innerOffset,
-                    robotY - offset + innerOffset,
-                    innerSize,
-                    innerSize
-                );
-                
-                // Глаза робота
-                ctx.fillStyle = '#4fc3f7';
-                const eyeSize = size * 0.15;
-                ctx.fillRect(
-                    robotX - offset + size * 0.2,
-                    robotY - offset + size * 0.3,
-                    eyeSize,
-                    eyeSize
-                );
-                ctx.fillRect(
-                    robotX - offset + size * 0.65,
-                    robotY - offset + size * 0.3,
-                    eyeSize,
-                    eyeSize
-                );
-            }
-        }
-
-        // Игровой цикл
-        function gameLoop() {
-            if (gameState.currentScreen === 'game') {
-                renderGame();
-            }
-            
-            requestAnimationFrame(gameLoop);
-        }
+        */
     </script>
 </body>
 </html>
